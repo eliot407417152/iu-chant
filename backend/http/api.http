@@ -1,0 +1,66 @@
+### IntelliJ 內建 HTTP Client：點每個請求左邊的綠色箭頭就能執行
+
+### 專輯與歌曲清單（依發行日期由舊到新）
+GET http://localhost:8080/api/albums
+
+### 單首歌（含影片與歌詞）
+GET http://localhost:8080/api/songs/i-stan-u
+
+### 補上一首歌的影片、應援歌單順序與各版本歌詞（用網頁的管理員模式比較快：http://localhost:3000/admin）
+### 影片：chant = 應援版本、mv = MV、inst = 純音樂、live = LIVE版；沒有的就省略。offsetSec：歌詞時間 = 影片播放時間 + offsetSec（通常 0）
+### chantOrder：在應援歌單中的順序，不在歌單就省略
+### lyrics：每個版本各自一份歌詞（chant / mv / inst / live），沒有的給空陣列
+### 歌詞 chant 可填：sing（跟唱）、call（喊口號）、cheer（歡呼）、clap、quiet、all；不是應援就省略
+PUT http://localhost:8080/api/admin/songs/i-stan-u/content
+Content-Type: application/json
+X-Admin-Key: change-me
+
+{
+  "chant": { "id": "6ElB5I2r-U8", "offsetSec": 0 },
+  "live": { "id": "11碼影片ID", "offsetSec": 0 },
+  "chantOrder": 3,
+  "lyrics": {
+    "chant": [
+      { "startSec": 0, "text": "<歌詞>", "sub": "<翻譯>" },
+      { "startSec": 10.5, "text": "<歌詞>", "roman": "<空耳>", "sub": "<翻譯>", "chant": "sing" }
+    ],
+    "mv": [],
+    "inst": [],
+    "live": [
+      { "startSec": 3.2, "text": "<歌詞>", "sub": "<翻譯>" }
+    ]
+  }
+}
+
+### 匯出備份（全部專輯、影片、應援歌單順序、各版本歌詞）
+GET http://localhost:8080/api/admin/backup
+X-Admin-Key: change-me
+
+### 匯入備份：貼上匯出的 JSON 內容（依 slug 新增或覆蓋；備份裡沒有的歌曲不會被刪除）
+# POST http://localhost:8080/api/admin/backup/restore
+# Content-Type: application/json
+# X-Admin-Key: change-me
+#
+# { "version": 1, "albums": [ ... ] }
+
+### 驗證管理金鑰
+GET http://localhost:8080/api/admin/ping
+X-Admin-Key: change-me
+
+### 新增新發行的專輯或單曲（格式同 seed/catalog.json）
+POST http://localhost:8080/api/admin/catalog/import
+Content-Type: application/json
+X-Admin-Key: change-me
+
+[
+  {
+    "slug": "my-new-single",
+    "title": "我的新單曲",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2027-01-01",
+    "songs": [
+      { "slug": "my-new-single-song", "trackNo": 1, "title": "我的新單曲", "durationSec": 200, "titleTrack": true }
+    ]
+  }
+]

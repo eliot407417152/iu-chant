@@ -1,0 +1,9 @@
+# 啟用方式：Active profiles 設為 postgres（需先 docker compose up -d）
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/iuchant
+    username: iuchant
+    password: iuchant
+  h2:
+    console:
+      enabled: false

@@ -1,0 +1,1332 @@
+[
+  {
+    "slug": "lost-and-found",
+    "title": "Lost and Found",
+    "typeLabel": "迷你一輯",
+    "type": "mini",
+    "releaseDate": "2008-09-23",
+    "songs": [
+      {
+        "slug": "ugly-duckling",
+        "trackNo": 1,
+        "title": "미운 오리 (Ugly Duckling)",
+        "durationSec": 208
+      },
+      {
+        "slug": "lost-child",
+        "trackNo": 2,
+        "title": "미아 (Lost Child)",
+        "durationSec": 222,
+        "titleTrack": true
+      },
+      {
+        "slug": "you-know",
+        "trackNo": 3,
+        "title": "있잖아 (You Know)",
+        "durationSec": 201,
+        "featuring": "Feat. Mario"
+      },
+      {
+        "slug": "feel-so-good",
+        "trackNo": 4,
+        "title": "Feel So Good",
+        "durationSec": 243
+      },
+      {
+        "slug": "every-sweet-day",
+        "trackNo": 5,
+        "title": "Every Sweet Day",
+        "durationSec": 209
+      }
+    ]
+  },
+  {
+    "slug": "growing-up",
+    "title": "Growing Up",
+    "typeLabel": "正規一輯",
+    "type": "studio",
+    "releaseDate": "2009-04-23",
+    "songs": [
+      {
+        "slug": "looking-at-you",
+        "trackNo": 1,
+        "title": "바라보기 (Looking At You)",
+        "durationSec": 203
+      },
+      {
+        "slug": "boo",
+        "trackNo": 2,
+        "title": "Boo",
+        "durationSec": 203,
+        "titleTrack": true,
+        "chantOrder": 16
+      },
+      {
+        "slug": "pitiful",
+        "trackNo": 3,
+        "title": "가여워 (Pitiful)",
+        "durationSec": 200
+      },
+      {
+        "slug": "a-dreamer",
+        "trackNo": 4,
+        "title": "A Dreamer",
+        "durationSec": 255
+      },
+      {
+        "slug": "every-sweet-day-growing-up",
+        "trackNo": 5,
+        "title": "Every Sweet Day",
+        "durationSec": 209
+      },
+      {
+        "slug": "lost-child-growing-up",
+        "trackNo": 6,
+        "title": "미아 (Lost Child)",
+        "durationSec": 222
+      },
+      {
+        "slug": "four-without-me",
+        "trackNo": 7,
+        "title": "나 말고 넷 (Four Without Me)",
+        "durationSec": 190
+      },
+      {
+        "slug": "you-know-growing-up",
+        "trackNo": 8,
+        "title": "있잖아 (You Know)",
+        "durationSec": 201,
+        "featuring": "Feat. Mario"
+      },
+      {
+        "slug": "graduation-day",
+        "trackNo": 9,
+        "title": "졸업하는 날 (Graduation Day)",
+        "durationSec": 224
+      },
+      {
+        "slug": "feel-so-good-growing-up",
+        "trackNo": 10,
+        "title": "Feel So Good",
+        "durationSec": 243
+      },
+      {
+        "slug": "ugly-duckling-growing-up",
+        "trackNo": 11,
+        "title": "미운 오리 (Ugly Duckling)",
+        "durationSec": 208
+      },
+      {
+        "slug": "face-to-face",
+        "trackNo": 12,
+        "title": "마주보기 (그 후로) (Face to Face)",
+        "durationSec": 203
+      },
+      {
+        "slug": "acoustic-ver",
+        "trackNo": 13,
+        "title": "미아 (Acoustic Ver.)",
+        "durationSec": 227
+      },
+      {
+        "slug": "rock-ver",
+        "trackNo": 14,
+        "title": "있잖아 (Rock Ver.)",
+        "durationSec": 190,
+        "chantOrder": 17
+      }
+    ]
+  },
+  {
+    "slug": "iu-im",
+    "title": "IU...IM",
+    "typeLabel": "迷你二輯",
+    "type": "mini",
+    "releaseDate": "2009-11-12",
+    "songs": [
+      {
+        "slug": "love-attack",
+        "trackNo": 1,
+        "title": "Love Attack",
+        "durationSec": 190,
+        "chantOrder": 15
+      },
+      {
+        "slug": "taking-a-train",
+        "trackNo": 2,
+        "title": "기차를 타고 (Taking a Train)",
+        "durationSec": 223
+      },
+      {
+        "slug": "marshmallow",
+        "trackNo": 3,
+        "title": "마쉬멜로우 (Marshmallow)",
+        "durationSec": 194,
+        "titleTrack": true,
+        "featuring": "Feat. Zico",
+        "chantOrder": 14
+      },
+      {
+        "slug": "tear-drops-in-the-morning",
+        "trackNo": 4,
+        "title": "아침 눈물 (Tear Drops in the Morning)",
+        "durationSec": 230
+      },
+      {
+        "slug": "heart-beating-date",
+        "trackNo": 5,
+        "title": "두근두근 데이트 (Heart Beating Date)",
+        "durationSec": 201
+      }
+    ]
+  },
+  {
+    "slug": "nagging",
+    "title": "잔소리 (Nagging)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2010-06-03",
+    "songs": [
+      {
+        "slug": "nagging",
+        "trackNo": 1,
+        "title": "잔소리 (Nagging)",
+        "durationSec": 215,
+        "titleTrack": true,
+        "featuring": "With 任瑟雍"
+      },
+      {
+        "slug": "rain-drop",
+        "trackNo": 2,
+        "title": "Rain Drop",
+        "durationSec": 228
+      }
+    ]
+  },
+  {
+    "slug": "it-s-you",
+    "title": "그대네요 (It's You)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2010-09-28",
+    "songs": [
+      {
+        "slug": "it-s-you",
+        "trackNo": 1,
+        "title": "그대네요 (It's You)",
+        "durationSec": 273,
+        "titleTrack": true,
+        "featuring": "With 成始璄"
+      }
+    ]
+  },
+  {
+    "slug": "real",
+    "title": "Real",
+    "typeLabel": "迷你三輯",
+    "type": "mini",
+    "releaseDate": "2010-12-09",
+    "songs": [
+      {
+        "slug": "not-like-this",
+        "trackNo": 1,
+        "title": "이게 아닌데 (Not Like This)",
+        "durationSec": 186
+      },
+      {
+        "slug": "what-i-m-doing-slow",
+        "trackNo": 2,
+        "title": "느리게 하는 일 (What I'm Doing Slow)",
+        "durationSec": 253
+      },
+      {
+        "slug": "good-day",
+        "trackNo": 3,
+        "title": "좋은 날 (Good Day)",
+        "durationSec": 233,
+        "titleTrack": true,
+        "chantOrder": 13
+      },
+      {
+        "slug": "the-night-of-the-first-breakup",
+        "trackNo": 4,
+        "title": "첫 이별 그날 밤 (The Night of the First Breakup)",
+        "durationSec": 266
+      },
+      {
+        "slug": "in-a-room-alone",
+        "trackNo": 5,
+        "title": "혼자 있는 방 (In a Room Alone)",
+        "durationSec": 238
+      },
+      {
+        "slug": "merry-christmas-ahead",
+        "trackNo": 6,
+        "title": "미리 메리 크리스마스 (Merry Christmas Ahead)",
+        "durationSec": 268,
+        "featuring": "Feat. 天動"
+      }
+    ]
+  },
+  {
+    "slug": "real-plus",
+    "title": "Real+",
+    "typeLabel": "擴充單曲專輯",
+    "type": "single",
+    "releaseDate": "2011-02-17",
+    "songs": [
+      {
+        "slug": "the-story-only-i-didn-t-know",
+        "trackNo": 1,
+        "title": "나만 몰랐던 이야기 (The Story Only I Didn't Know)",
+        "durationSec": 205,
+        "titleTrack": true
+      },
+      {
+        "slug": "scary-fairy-tale",
+        "trackNo": 2,
+        "title": "잔혹동화 (Scary Fairy Tale)",
+        "durationSec": 225
+      },
+      {
+        "slug": "real-plus-track-3",
+        "trackNo": 3,
+        "title": "나만 몰랐던 이야기 (With Pianist 金光民)",
+        "durationSec": 199
+      }
+    ]
+  },
+  {
+    "slug": "ice-flower",
+    "title": "얼음꽃 (Ice Flower)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2011-06-21",
+    "songs": [
+      {
+        "slug": "ice-flower",
+        "trackNo": 1,
+        "title": "얼음꽃 (Ice Flower)",
+        "durationSec": 214,
+        "titleTrack": true,
+        "featuring": "With 金妍兒"
+      }
+    ]
+  },
+  {
+    "slug": "last-fantasy",
+    "title": "Last Fantasy",
+    "typeLabel": "正規二輯",
+    "type": "studio",
+    "releaseDate": "2011-11-29",
+    "songs": [
+      {
+        "slug": "secret",
+        "trackNo": 1,
+        "title": "비밀 (Secret)",
+        "durationSec": 244
+      },
+      {
+        "slug": "sleeping-prince",
+        "trackNo": 2,
+        "title": "잠자는 숲 속의 왕자 (Sleeping Prince)",
+        "durationSec": 214,
+        "featuring": "Feat. 尹尚"
+      },
+      {
+        "slug": "holding-a-star-in-my-heart",
+        "trackNo": 3,
+        "title": "별을 찾는 아이 (Holding a Star in My Heart)",
+        "durationSec": 238,
+        "featuring": "Feat. 金光振"
+      },
+      {
+        "slug": "you-i",
+        "trackNo": 4,
+        "title": "너랑 나 (You & I)",
+        "durationSec": 239,
+        "titleTrack": true,
+        "chantOrder": 12
+      },
+      {
+        "slug": "wallpaper-pattern",
+        "trackNo": 5,
+        "title": "벽지무늬 (Wallpaper Pattern)",
+        "durationSec": 220
+      },
+      {
+        "slug": "uncle",
+        "trackNo": 6,
+        "title": "삼촌 (Uncle)",
+        "durationSec": 204,
+        "featuring": "Feat. 李笛"
+      },
+      {
+        "slug": "wisdom-tooth",
+        "trackNo": 7,
+        "title": "사랑니 (Wisdom Tooth)",
+        "durationSec": 213
+      },
+      {
+        "slug": "everything-s-alright",
+        "trackNo": 8,
+        "title": "Everything's Alright",
+        "durationSec": 213,
+        "featuring": "Feat. 金賢哲"
+      },
+      {
+        "slug": "last-fantasy",
+        "trackNo": 9,
+        "title": "Last Fantasy",
+        "durationSec": 367
+      },
+      {
+        "slug": "teacher",
+        "trackNo": 10,
+        "title": "Teacher",
+        "durationSec": 241,
+        "featuring": "Feat. Ra.D"
+      },
+      {
+        "slug": "the-abandoned",
+        "trackNo": 11,
+        "title": "길 잃은 강아지 (The Abandoned)",
+        "durationSec": 194
+      },
+      {
+        "slug": "4am",
+        "trackNo": 12,
+        "title": "4AM",
+        "durationSec": 182
+      },
+      {
+        "slug": "l-amant",
+        "trackNo": 13,
+        "title": "라망 (L'amant)",
+        "durationSec": 352
+      }
+    ]
+  },
+  {
+    "slug": "spring-of-a-twenty-year-old",
+    "title": "스무 살의 봄 (Spring of a Twenty Year Old)",
+    "typeLabel": "單曲專輯",
+    "type": "single",
+    "releaseDate": "2012-05-11",
+    "songs": [
+      {
+        "slug": "peach",
+        "trackNo": 1,
+        "title": "복숭아 (Peach)",
+        "durationSec": 190
+      },
+      {
+        "slug": "every-end-of-the-day",
+        "trackNo": 2,
+        "title": "하루 끝 (Every End of the Day)",
+        "durationSec": 242,
+        "titleTrack": true,
+        "chantOrder": 11
+      },
+      {
+        "slug": "don-t-like-her",
+        "trackNo": 3,
+        "title": "그 애 참 싫다 (Don't Like Her)",
+        "durationSec": 257
+      }
+    ]
+  },
+  {
+    "slug": "modern-times",
+    "title": "Modern Times",
+    "typeLabel": "正規三輯",
+    "type": "studio",
+    "releaseDate": "2013-10-08",
+    "songs": [
+      {
+        "slug": "love-of-b",
+        "trackNo": 1,
+        "title": "을의 연애 (Love of B)",
+        "durationSec": 191,
+        "featuring": "With 朴주원"
+      },
+      {
+        "slug": "everybody-has-secrets",
+        "trackNo": 2,
+        "title": "누구나 비밀은 있다 (Everybody Has Secrets)",
+        "durationSec": 229,
+        "featuring": "Feat. 佳仁"
+      },
+      {
+        "slug": "50cm",
+        "trackNo": 3,
+        "title": "입술 사이 (50cm) (Between the Lips)",
+        "durationSec": 170
+      },
+      {
+        "slug": "the-red-shoes",
+        "trackNo": 4,
+        "title": "분홍신 (The Red Shoes)",
+        "durationSec": 254,
+        "titleTrack": true,
+        "chantOrder": 10
+      },
+      {
+        "slug": "modern-times",
+        "trackNo": 5,
+        "title": "Modern Times",
+        "durationSec": 205
+      },
+      {
+        "slug": "bad-day",
+        "trackNo": 6,
+        "title": "싫은 날 (Bad Day)",
+        "durationSec": 232
+      },
+      {
+        "slug": "obliviate",
+        "trackNo": 7,
+        "title": "Obliviate",
+        "durationSec": 190
+      },
+      {
+        "slug": "walk-with-me-girl",
+        "trackNo": 8,
+        "title": "아이야 나랑 걷자 (Walk with Me, Girl)",
+        "durationSec": 300,
+        "featuring": "Feat. 崔白虎"
+      },
+      {
+        "slug": "havana",
+        "trackNo": 9,
+        "title": "Havana",
+        "durationSec": 249
+      },
+      {
+        "slug": "gloomy-clock",
+        "trackNo": 10,
+        "title": "우울시계 (Gloomy Clock)",
+        "durationSec": 168,
+        "featuring": "Feat. 鐘鉉"
+      },
+      {
+        "slug": "daydream",
+        "trackNo": 11,
+        "title": "한낮의 꿈 (Daydream)",
+        "durationSec": 220,
+        "featuring": "Feat. 楊姬銀"
+      },
+      {
+        "slug": "wait",
+        "trackNo": 12,
+        "title": "기다려 (Wait)",
+        "durationSec": 150
+      },
+      {
+        "slug": "voice-mail-korean-ver-bonus-track",
+        "trackNo": 13,
+        "title": "Voice Mail (Korean Ver.) (Bonus Track)",
+        "durationSec": 246
+      }
+    ]
+  },
+  {
+    "slug": "modern-times-epilogue",
+    "title": "Modern Times – Epilogue",
+    "typeLabel": "正規三輯改版",
+    "type": "repackage",
+    "releaseDate": "2013-12-20",
+    "songs": [
+      {
+        "slug": "friday",
+        "trackNo": 1,
+        "title": "금요일에 만나요 (Friday)",
+        "durationSec": 217,
+        "titleTrack": true,
+        "featuring": "Feat. 張利貞",
+        "note": "新增曲目"
+      },
+      {
+        "slug": "pastel-crayon",
+        "trackNo": 2,
+        "title": "크레파스 (Pastel Crayon)",
+        "durationSec": 193,
+        "note": "新增曲目"
+      }
+    ],
+    "note": "其餘 13 首曲目同正規三輯《Modern Times》"
+  },
+  {
+    "slug": "not-spring-love-or-cherry-blossoms",
+    "title": "봄 사랑 벚꽃 말고 (Not Spring, Love, or Cherry Blossoms)",
+    "typeLabel": "合作數位單曲",
+    "type": "single",
+    "releaseDate": "2014-04-08",
+    "songs": [
+      {
+        "slug": "not-spring-love-or-cherry-blossoms",
+        "trackNo": 1,
+        "title": "봄 사랑 벚꽃 말고 (Not Spring, Love, or Cherry Blossoms)",
+        "durationSec": 198,
+        "titleTrack": true,
+        "featuring": "With HIGH4"
+      }
+    ]
+  },
+  {
+    "slug": "a-flower-bookmark",
+    "title": "꽃갈피 (A Flower Bookmark)",
+    "typeLabel": "翻唱專輯・花書籤1",
+    "type": "remake",
+    "releaseDate": "2014-05-16",
+    "songs": [
+      {
+        "slug": "my-old-story",
+        "trackNo": 1,
+        "title": "나의 옛날이야기 (My Old Story)",
+        "durationSec": 213
+      },
+      {
+        "slug": "flower",
+        "trackNo": 2,
+        "title": "꽃 (Flower)",
+        "durationSec": 179
+      },
+      {
+        "slug": "pierrot-laughs-at-us",
+        "trackNo": 3,
+        "title": "삐에로는 우릴 보고 웃지 (Pierrot Laughs at Us)",
+        "durationSec": 233
+      },
+      {
+        "slug": "when-love-passes-by",
+        "trackNo": 4,
+        "title": "사랑이 지나가면 (When Love Passes By)",
+        "durationSec": 240
+      },
+      {
+        "slug": "meaning-of-you",
+        "trackNo": 5,
+        "title": "너의 의미 (Meaning of You)",
+        "durationSec": 195,
+        "featuring": "Feat. 金昌完"
+      },
+      {
+        "slug": "dream-in-summer-night",
+        "trackNo": 6,
+        "title": "여름밤의 꿈 (Dream in Summer Night)",
+        "durationSec": 238
+      },
+      {
+        "slug": "boom-ladi-dadi",
+        "trackNo": 7,
+        "title": "꿍따리 샤바라 (Boom Ladi Dadi)",
+        "durationSec": 228,
+        "featuring": "Feat. 酷龍"
+      },
+      {
+        "slug": "a-flower-bookmark-track-8",
+        "trackNo": 8,
+        "title": "어허야 둥기둥기",
+        "durationSec": 154,
+        "note": "LP Only"
+      }
+    ]
+  },
+  {
+    "slug": "summer-love",
+    "title": "애타는 마음 (Summer Love)",
+    "typeLabel": "合作數位單曲",
+    "type": "single",
+    "releaseDate": "2014-07-08",
+    "songs": [
+      {
+        "slug": "summer-love",
+        "trackNo": 1,
+        "title": "애타는 마음 (Summer Love)",
+        "durationSec": 196,
+        "titleTrack": true,
+        "featuring": "With ULALA SESSION"
+      }
+    ]
+  },
+  {
+    "slug": "sogyeokdong",
+    "title": "소격동 (Sogyeokdong)",
+    "typeLabel": "合作數位單曲",
+    "type": "single",
+    "releaseDate": "2014-10-02",
+    "songs": [
+      {
+        "slug": "sogyeokdong",
+        "trackNo": 1,
+        "title": "소격동 (Sogyeokdong) (IU Ver.)",
+        "durationSec": 225,
+        "titleTrack": true
+      }
+    ]
+  },
+  {
+    "slug": "heart",
+    "title": "마음 (Heart)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2015-05-18",
+    "songs": [
+      {
+        "slug": "heart",
+        "trackNo": 1,
+        "title": "마음 (Heart)",
+        "durationSec": 167,
+        "titleTrack": true
+      }
+    ]
+  },
+  {
+    "slug": "chat-shire",
+    "title": "CHAT-SHIRE",
+    "typeLabel": "迷你四輯",
+    "type": "mini",
+    "releaseDate": "2015-10-23",
+    "songs": [
+      {
+        "slug": "shoes",
+        "trackNo": 1,
+        "title": "새 신발 (Shoes)",
+        "durationSec": 215
+      },
+      {
+        "slug": "zez",
+        "trackNo": 2,
+        "title": "Zezé",
+        "durationSec": 190
+      },
+      {
+        "slug": "twenty-three",
+        "trackNo": 3,
+        "title": "스물셋 (Twenty-Three)",
+        "durationSec": 194,
+        "titleTrack": true,
+        "chantOrder": 9
+      },
+      {
+        "slug": "the-shower",
+        "trackNo": 4,
+        "title": "푸르던 (The Shower)",
+        "durationSec": 247
+      },
+      {
+        "slug": "red-queen",
+        "trackNo": 5,
+        "title": "Red Queen",
+        "durationSec": 212,
+        "featuring": "Feat. Zion.T"
+      },
+      {
+        "slug": "knees",
+        "trackNo": 6,
+        "title": "무릎 (Knees)",
+        "durationSec": 282
+      },
+      {
+        "slug": "glasses",
+        "trackNo": 7,
+        "title": "안경 (Glasses)",
+        "durationSec": 196
+      },
+      {
+        "slug": "heart-chat-shire",
+        "trackNo": 8,
+        "title": "마음 (Heart) *(CD Only)*",
+        "durationSec": 167
+      },
+      {
+        "slug": "twenty-three-cd-only",
+        "trackNo": 9,
+        "title": "Twenty Three *(CD Only)*",
+        "durationSec": 210
+      }
+    ]
+  },
+  {
+    "slug": "palette",
+    "title": "Palette",
+    "typeLabel": "正規四輯",
+    "type": "studio",
+    "releaseDate": "2017-04-21",
+    "songs": [
+      {
+        "slug": "dlwlrma",
+        "trackNo": 1,
+        "title": "이지금 (Dlwlrma)",
+        "durationSec": 176,
+        "chantOrder": 8
+      },
+      {
+        "slug": "palette",
+        "trackNo": 2,
+        "title": "Palette",
+        "durationSec": 217,
+        "titleTrack": true,
+        "featuring": "Feat. G-DRAGON",
+        "chantOrder": 7
+      },
+      {
+        "slug": "ending-scene",
+        "trackNo": 3,
+        "title": "이런 엔딩 (Ending Scene)",
+        "durationSec": 249
+      },
+      {
+        "slug": "can-t-love-you-anymore",
+        "trackNo": 4,
+        "title": "사랑이 잘 (Can't Love You Anymore)",
+        "durationSec": 195,
+        "featuring": "With 吳赫",
+        "note": "先行單曲 2017.04.07"
+      },
+      {
+        "slug": "jam-jam",
+        "trackNo": 5,
+        "title": "잼잼 (Jam Jam)",
+        "durationSec": 218
+      },
+      {
+        "slug": "black-out",
+        "trackNo": 6,
+        "title": "Black Out",
+        "durationSec": 227
+      },
+      {
+        "slug": "full-stop",
+        "trackNo": 7,
+        "title": "마침표 (Full Stop)",
+        "durationSec": 236
+      },
+      {
+        "slug": "through-the-night",
+        "trackNo": 8,
+        "title": "밤편지 (Through the Night)",
+        "durationSec": 253,
+        "note": "先行單曲 2017.03.24"
+      },
+      {
+        "slug": "love-alone",
+        "trackNo": 9,
+        "title": "그렇게 사랑은 (Love Alone)",
+        "durationSec": 281
+      },
+      {
+        "slug": "dear-name",
+        "trackNo": 10,
+        "title": "이름에게 (Dear Name)",
+        "durationSec": 289
+      }
+    ]
+  },
+  {
+    "slug": "a-flower-bookmark-2",
+    "title": "꽃갈피 둘 (A Flower Bookmark 2)",
+    "typeLabel": "翻唱專輯・花書籤2",
+    "type": "remake",
+    "releaseDate": "2017-09-22",
+    "songs": [
+      {
+        "slug": "autumn-morning",
+        "trackNo": 1,
+        "title": "가을 아침 (Autumn Morning)",
+        "durationSec": 217
+      },
+      {
+        "slug": "secret-garden",
+        "trackNo": 2,
+        "title": "비밀의 화원 (Secret Garden)",
+        "durationSec": 224
+      },
+      {
+        "slug": "sleepless-rainy-night",
+        "trackNo": 3,
+        "title": "잠 못 드는 밤 비는 내리고 (Sleepless Rainy Night)",
+        "durationSec": 266
+      },
+      {
+        "slug": "last-night-story",
+        "trackNo": 4,
+        "title": "어젯밤 이야기 (Last Night Story)",
+        "durationSec": 233
+      },
+      {
+        "slug": "by-the-stream",
+        "trackNo": 5,
+        "title": "개여울 (By the Stream)",
+        "durationSec": 337
+      },
+      {
+        "slug": "everyday-with-you",
+        "trackNo": 6,
+        "title": "매일 그대와 (Everyday with You)",
+        "durationSec": 224
+      }
+    ]
+  },
+  {
+    "slug": "bbibbi",
+    "title": "삐삐 (BBIBBI)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2018-10-10",
+    "songs": [
+      {
+        "slug": "bbibbi",
+        "trackNo": 1,
+        "title": "삐삐 (BBIBBI)",
+        "durationSec": 194,
+        "titleTrack": true,
+        "chantOrder": 6
+      }
+    ]
+  },
+  {
+    "slug": "love-poem",
+    "title": "Love poem",
+    "typeLabel": "迷你五輯",
+    "type": "mini",
+    "releaseDate": "2019-11-18",
+    "songs": [
+      {
+        "slug": "unlucky",
+        "trackNo": 1,
+        "title": "unlucky",
+        "durationSec": 231
+      },
+      {
+        "slug": "the-visitor",
+        "trackNo": 2,
+        "title": "그 사람 (The Visitor)",
+        "durationSec": 231
+      },
+      {
+        "slug": "blueming",
+        "trackNo": 3,
+        "title": "Blueming",
+        "durationSec": 217,
+        "titleTrack": true,
+        "chantOrder": 5
+      },
+      {
+        "slug": "above-the-time",
+        "trackNo": 4,
+        "title": "시간의 바깥 (Above the Time)",
+        "durationSec": 300
+      },
+      {
+        "slug": "lullaby",
+        "trackNo": 5,
+        "title": "자장가 (Lullaby)",
+        "durationSec": 261
+      },
+      {
+        "slug": "love-poem",
+        "trackNo": 6,
+        "title": "Love poem",
+        "durationSec": 258,
+        "titleTrack": true,
+        "note": "先行單曲 2019.11.01"
+      }
+    ]
+  },
+  {
+    "slug": "first-winter",
+    "title": "첫 겨울이니까 (First Winter)",
+    "typeLabel": "合作數位單曲",
+    "type": "single",
+    "releaseDate": "2019-12-09",
+    "songs": [
+      {
+        "slug": "first-winter",
+        "trackNo": 1,
+        "title": "첫 겨울이니까 (First Winter)",
+        "durationSec": 232,
+        "titleTrack": true,
+        "featuring": "With 成始璄"
+      }
+    ]
+  },
+  {
+    "slug": "eight",
+    "title": "에잇 (eight)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2020-05-06",
+    "songs": [
+      {
+        "slug": "eight",
+        "trackNo": 1,
+        "title": "에잇 (eight)",
+        "durationSec": 167,
+        "titleTrack": true,
+        "featuring": "Prod. & Feat. SUGA"
+      }
+    ]
+  },
+  {
+    "slug": "lilac",
+    "title": "LILAC",
+    "typeLabel": "正規五輯",
+    "type": "studio",
+    "releaseDate": "2021-03-25",
+    "songs": [
+      {
+        "slug": "lilac",
+        "trackNo": 1,
+        "title": "라일락 (LILAC)",
+        "durationSec": 214,
+        "titleTrack": true,
+        "chantOrder": 4
+      },
+      {
+        "slug": "flu",
+        "trackNo": 2,
+        "title": "Flu",
+        "durationSec": 188
+      },
+      {
+        "slug": "coin",
+        "trackNo": 3,
+        "title": "Coin",
+        "durationSec": 193,
+        "titleTrack": true
+      },
+      {
+        "slug": "hi-spring-bye",
+        "trackNo": 4,
+        "title": "봄 안녕 봄 (Hi Spring Bye)",
+        "durationSec": 324
+      },
+      {
+        "slug": "celebrity",
+        "trackNo": 5,
+        "title": "Celebrity",
+        "durationSec": 195,
+        "note": "先行單曲 2021.01.27"
+      },
+      {
+        "slug": "troll",
+        "trackNo": 6,
+        "title": "돌림노래 (Troll)",
+        "durationSec": 189,
+        "featuring": "Feat. DEAN"
+      },
+      {
+        "slug": "empty-cup",
+        "trackNo": 7,
+        "title": "빈 컵 (Empty Cup)",
+        "durationSec": 139
+      },
+      {
+        "slug": "my-sea",
+        "trackNo": 8,
+        "title": "아이와 나의 바다 (My Sea)",
+        "durationSec": 316
+      },
+      {
+        "slug": "ah-puh",
+        "trackNo": 9,
+        "title": "어푸 (Ah Puh)",
+        "durationSec": 200
+      },
+      {
+        "slug": "epilogue",
+        "trackNo": 10,
+        "title": "에필로그 (Epilogue)",
+        "durationSec": 229
+      }
+    ]
+  },
+  {
+    "slug": "strawberry-moon",
+    "title": "strawberry moon",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2021-10-19",
+    "songs": [
+      {
+        "slug": "strawberry-moon",
+        "trackNo": 1,
+        "title": "strawberry moon",
+        "durationSec": 205,
+        "titleTrack": true
+      }
+    ]
+  },
+  {
+    "slug": "pieces",
+    "title": "조각집 (Pieces)",
+    "typeLabel": "特別迷你專輯",
+    "type": "mini",
+    "releaseDate": "2021-12-29",
+    "songs": [
+      {
+        "slug": "drama",
+        "trackNo": 1,
+        "title": "드라마 (Drama)",
+        "durationSec": 128
+      },
+      {
+        "slug": "next-stop",
+        "trackNo": 2,
+        "title": "정거장 (Next Stop)",
+        "durationSec": 236
+      },
+      {
+        "slug": "winter-sleep",
+        "trackNo": 3,
+        "title": "겨울잠 (Winter Sleep)",
+        "durationSec": 262,
+        "titleTrack": true
+      },
+      {
+        "slug": "you",
+        "trackNo": 4,
+        "title": "너 (You)",
+        "durationSec": 206
+      },
+      {
+        "slug": "love-letter",
+        "trackNo": 5,
+        "title": "러브레터 (Love Letter)",
+        "durationSec": 238
+      }
+    ]
+  },
+  {
+    "slug": "the-winning",
+    "title": "The Winning",
+    "typeLabel": "迷你六輯",
+    "type": "mini",
+    "releaseDate": "2024-02-20",
+    "songs": [
+      {
+        "slug": "shopper",
+        "trackNo": 1,
+        "title": "Shopper",
+        "durationSec": 215,
+        "titleTrack": true,
+        "chantOrder": 1
+      },
+      {
+        "slug": "holssi",
+        "trackNo": 2,
+        "title": "홀씨 (Holssi)",
+        "durationSec": 190,
+        "titleTrack": true,
+        "chantOrder": 2
+      },
+      {
+        "slug": "shh",
+        "trackNo": 3,
+        "title": "Shh..",
+        "durationSec": 227,
+        "featuring": "Feat. HYEIN, 趙元善 & Special Narr. Patti Kim"
+      },
+      {
+        "slug": "love-wins-all",
+        "trackNo": 4,
+        "title": "Love wins all",
+        "durationSec": 271,
+        "titleTrack": true,
+        "note": "先行單曲 2024.01.24"
+      },
+      {
+        "slug": "i-stan-u",
+        "trackNo": 5,
+        "title": "관객이 될게 (I Stan U)",
+        "durationSec": 192,
+        "chantOrder": 3
+      }
+    ]
+  },
+  {
+    "slug": "a-flower-bookmark-3",
+    "title": "꽃갈피 셋 (A Flower Bookmark 3)",
+    "typeLabel": "翻唱專輯・花書籤3",
+    "type": "remake",
+    "releaseDate": "2025-05-27",
+    "songs": [
+      {
+        "slug": "red-sneakers",
+        "trackNo": 1,
+        "title": "빨간 운동화 (Red Sneakers)",
+        "durationSec": 206
+      },
+      {
+        "slug": "never-ending-story",
+        "trackNo": 2,
+        "title": "Never Ending Story",
+        "durationSec": 224
+      },
+      {
+        "slug": "october-4th",
+        "trackNo": 3,
+        "title": "10월 4일 (October 4th)",
+        "durationSec": 232
+      },
+      {
+        "slug": "last-scene",
+        "trackNo": 4,
+        "title": "Last Scene",
+        "durationSec": 243,
+        "featuring": "Feat. Wonstein"
+      },
+      {
+        "slug": "a-beautiful-person",
+        "trackNo": 5,
+        "title": "미인 (A Beautiful Person)",
+        "durationSec": 210,
+        "featuring": "Feat. Balming Tiger"
+      },
+      {
+        "slug": "square-s-dream",
+        "trackNo": 6,
+        "title": "네모의 꿈 (Square's Dream)",
+        "durationSec": 201
+      }
+    ]
+  },
+  {
+    "slug": "bye-summer",
+    "title": "바이, 썸머 (Bye, Summer)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2025-09-10",
+    "songs": [
+      {
+        "slug": "bye-summer",
+        "trackNo": 1,
+        "title": "바이, 썸머 (Bye, Summer)",
+        "durationSec": 228,
+        "titleTrack": true
+      }
+    ]
+  },
+  {
+    "slug": "unknown-planet",
+    "title": "이 별로부터 (Unknown Planet)",
+    "typeLabel": "數位單曲",
+    "type": "single",
+    "releaseDate": "2026-09-10",
+    "songs": [
+      {
+        "slug": "unknown-planet",
+        "trackNo": 1,
+        "title": "이 별로부터 (Unknown Planet)",
+        "durationSec": 225,
+        "titleTrack": true
+      },
+      {
+        "slug": "dear-my-crazy-soulmate",
+        "trackNo": 2,
+        "title": "Dear My Crazy Soulmate",
+        "durationSec": 156,
+        "titleTrack": true
+      }
+    ]
+  },
+  {
+    "slug": "dream-high-ost-part-1",
+    "title": "Dream High OST Part.1",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2011-01-03",
+    "songs": [
+      {
+        "slug": "someday",
+        "trackNo": 1,
+        "title": "Someday",
+        "durationSec": 218,
+        "note": "演唱會安安可點歌常客"
+      }
+    ]
+  },
+  {
+    "slug": "best-love",
+    "title": "最佳愛情 (Best Love) OST Part.4",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2011-05-25",
+    "songs": [
+      {
+        "slug": "hold-my-hand",
+        "trackNo": 1,
+        "title": "내 손을 잡아 (Hold My Hand / 牽起我的手)",
+        "durationSec": 195,
+        "note": "正式巡演固定神曲"
+      }
+    ]
+  },
+  {
+    "slug": "producers",
+    "title": "製作人的那些事 (Producers) 特別 OST",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2015-05-18",
+    "songs": [
+      {
+        "slug": "heart-producers",
+        "trackNo": 1,
+        "title": "마음 (Heart / 心)",
+        "durationSec": 167,
+        "note": "安可／安安可點歌常客；後收錄於《CHAT-SHIRE》CD 版"
+      }
+    ]
+  },
+  {
+    "slug": "hotel-del-luna",
+    "title": "德魯納酒店 (Hotel Del Luna)",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2019-08-18",
+    "songs": [
+      {
+        "slug": "our-square",
+        "trackNo": 1,
+        "title": "우리의 네모 (Our Square) / 해피엔딩 (Happy Ending)",
+        "durationSec": 0,
+        "note": "2019《Love, poem》演唱會安安可清唱曲目"
+      }
+    ],
+    "note": "第 12 集片尾插曲（未正式發行音源）"
+  },
+  {
+    "slug": "crash-landing-on-you",
+    "title": "愛的迫降 (Crash Landing on You) OST Part.11",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2020-02-15",
+    "songs": [
+      {
+        "slug": "give-you-my-heart",
+        "trackNo": 1,
+        "title": "마음을 드려요 (Give You My Heart / 獻上我的心)",
+        "durationSec": 280,
+        "note": "2024《HEREH》巡演安安可熱門點歌曲目"
+      }
+    ]
+  },
+  {
+    "slug": "when-life-gives-you-tangerines",
+    "title": "苦盡柑來遇見你 (When Life Gives You Tangerines) OST",
+    "typeLabel": "OST",
+    "type": "ost",
+    "releaseDate": "2025-03-15",
+    "songs": [
+      {
+        "slug": "midnight-walk",
+        "trackNo": 1,
+        "title": "밤 산책 (Midnight Walk)",
+        "durationSec": 198,
+        "note": "《Mini Palette》不插電 Live 曲目"
+      }
+    ]
+  }
+]

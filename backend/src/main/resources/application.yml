@@ -1,0 +1,24 @@
+server:
+  port: 8080
+
+spring:
+  application:
+    name: iu-chant-api
+  # 預設使用 H2 檔案資料庫（資料存在 backend/data/），不用安裝任何東西就能跑
+  datasource:
+    url: jdbc:h2:file:./data/iuchant;AUTO_SERVER=TRUE
+    username: sa
+    password:
+  h2:
+    console:
+      enabled: true        # http://localhost:8080/h2-console
+  jpa:
+    hibernate:
+      ddl-auto: update
+    open-in-view: false
+  jackson:
+    default-property-inclusion: non_null
+
+app:
+  admin-key: change-me                  # 管理 API 用的金鑰，正式環境請改掉
+  cors-origins: http://localhost:3000   # 多個用逗號分隔

@@ -1,0 +1,14 @@
+# 只在想用 PostgreSQL 時才需要：docker compose up -d
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: iuchant
+      POSTGRES_USER: iuchant
+      POSTGRES_PASSWORD: iuchant
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+volumes:
+  pgdata:
