@@ -156,6 +156,8 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
           </div>
         )}
 
+        {/* 手機上只有「影片＋下一個應援提示」會置頂，其餘（切換版本、上下首、選項）跟著頁面捲走，讓出空間給歌詞 */}
+        <div className="stage-pin">
         <div className="video">
           <div ref={containerRef} className="video-inner" />
           {error && <p className="video-error" role="alert">{error}</p>}
@@ -170,6 +172,7 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
           ) : (
             <span className="cue-text muted">{playing ? "後面沒有應援了" : "按下播放，開始跟著唱"}</span>
           )}
+        </div>
         </div>
 
         <div className="player-nav">

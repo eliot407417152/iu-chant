@@ -94,18 +94,20 @@ export default function AlbumBrowser({ albums }: { albums: Album[] }) {
   return (
     <>
       <div className="browse-bar">
-        <div className="filters" role="group" aria-label="分類">
-          {FILTERS.map((f) => (
-            <button
-              key={f.key}
-              type="button"
-              className={filter === f.key ? "filter is-on" : "filter"}
-              aria-pressed={filter === f.key}
-              onClick={() => setFilter(f.key)}
-            >
-              {f.label}（{f.key === "chant" ? `${chantSongs.length} 首` : albums.filter((a) => matches(a, f.key)).length}）
-            </button>
-          ))}
+        <div className="filters-row">
+          <div className="filters" role="group" aria-label="分類">
+            {FILTERS.map((f) => (
+              <button
+                key={f.key}
+                type="button"
+                className={filter === f.key ? "filter is-on" : "filter"}
+                aria-pressed={filter === f.key}
+                onClick={() => setFilter(f.key)}
+              >
+                {f.label}（{f.key === "chant" ? `${chantSongs.length} 首` : albums.filter((a) => matches(a, f.key)).length}）
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* 一律保留這一區的位置：切到「應援歌單」時只是隱藏，不會讓整列版面跳動 */}

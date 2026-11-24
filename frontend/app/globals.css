@@ -159,7 +159,7 @@ button { font: inherit; color: inherit; }
   flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink);
   padding: 5px 11px; border-radius: 999px; cursor: pointer; font-weight: 500;
-  font-size: clamp(.78rem, 2.9vw, .92rem);
+  font-size: clamp(.86rem, 3.4vw, .95rem);
 }
 .filter:hover { border-color: var(--accent); }
 /* 選中時不改字重，避免按鈕變寬而推動旁邊的元素 */
@@ -472,7 +472,7 @@ button { font: inherit; color: inherit; }
 
 /* ===== 字上方的標註（ruby）：標註置中對齊在那段字的正上方 ===== */
 .seg-ruby { ruby-position: over; ruby-align: center; }
-.seg-ruby rt { font-size: .55em; font-weight: 700; letter-spacing: .04em; line-height: 1.2; }
+.seg-ruby rt { font-size: .62em; font-weight: 700; letter-spacing: .04em; line-height: 1.2; }
 .has-ruby { line-height: 1.9; }
 .is-active .has-ruby { line-height: 2; }
 .ed-note-input {
@@ -480,3 +480,80 @@ button { font: inherit; color: inherit; }
   border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px;
 }
 .ed-notes select { font: inherit; font-size: .9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 4px 6px; }
+
+/* =====================================================================
+   手機版
+   原則：置頂的東西要小、歌詞要盡量大；按鈕夠大好點；輸入框 16px 以免 iPhone 自動放大
+   ===================================================================== */
+.stage-pin, .ed-stage, .ed-stage-side { display: contents; } /* 電腦版：這幾層不影響版面 */
+.song-head h1, .album-head h2, .track-title { overflow-wrap: anywhere; }
+
+@media (max-width: 899px) {
+  /* --- 首頁：只有分類列置頂（單行、可左右滑）；「跳到專輯／排序」跟著頁面捲走 --- */
+  .browse-bar { display: contents; }
+  .filters-row {
+    position: sticky; top: 0; z-index: 6; margin-top: 12px; padding: 8px 0;
+    background: color-mix(in srgb, var(--bg) 94%, transparent); backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .browse-actions { margin-top: 10px; }
+  .album { scroll-margin-top: 64px; }
+
+  /* --- 歌曲頁：只有「影片＋下一個應援提示」置頂，歌詞框撐滿剩下的高度 --- */
+  .song-grid { gap: 10px; }
+  .stage { position: static; display: contents; }
+  .stage-pin { display: block; position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 6px 0 8px; }
+  /* 影片最高佔螢幕的 30%：手機仍是全寬，平板不會大到把歌詞擠掉 */
+  .stage-pin .video { width: min(100%, calc(30dvh * 16 / 9)); margin-inline: auto; }
+  .kind-tabs { margin: 0; }
+  .cue { min-height: 38px; margin-top: 8px; padding: 5px 12px; font-size: .92rem; }
+  .player-nav, .player-opts { margin-top: 0; }
+  .nav-label { font-size: .75rem; line-height: 1.3; }
+  .lyrics { height: max(280px, calc(100dvh - 300px)); padding: 12dvh 0; }
+  .line-btn { padding: 12px 14px 12px 12px; }
+
+  /* --- 打點工具：影片＋打點鈕置頂，邊看邊打點、邊捲歌詞列表 --- */
+  .ed-grid { gap: 12px; }
+  .ed-left { display: contents; }
+  .ed-stage {
+    display: flex; gap: 10px; align-items: flex-start;
+    position: sticky; top: 0; z-index: 5; background: var(--bg); padding: 6px 0 8px;
+  }
+  .ed-stage .video { flex: 0 0 46%; }
+  .ed-stage-side { display: flex; flex-direction: column; gap: 6px; min-width: 0; flex: 1; }
+  .ed-stage-side .ed-editing { padding: 4px 8px; font-size: .8rem; }
+  .ed-stamp { flex-direction: column; align-items: stretch; gap: 4px; font-size: .8rem; }
+  .ed-stamp .stamp-btn { width: 100%; padding: 12px 10px; }
+  .ed-lines { max-height: none; }
+  .ed-row { scroll-margin-top: 160px; }
+
+  /* 16px 以下的輸入框，iPhone 一點就會自動放大頁面 */
+  input:not([type="checkbox"]):not([type="radio"]):not([type="color"]), select, textarea { font-size: 16px; }
+}
+
+@media (max-width: 899px) and (max-height: 500px) {
+  /* 手機橫放：螢幕太矮，不置頂 */
+  .stage-pin, .ed-stage { position: static; }
+  .lyrics { height: 85dvh; padding: 30dvh 0; }
+}
+
+@media (max-width: 520px) {
+  .album-head h2 { font-size: 1.25rem; }
+  .playlist-card h2 { font-size: 1.3rem; }
+  .home-head p { font-size: .95rem; }
+}
+
+/* 觸控螢幕：按鈕至少約 40px 高，手指才好點 */
+@media (pointer: coarse) {
+  .filter, .kind-tab { min-height: 40px; }
+  .pill, .btn { min-height: 38px; }
+  .btn-sm { min-height: 36px; }
+  .toggle { min-height: 40px; }
+  .toggle input { width: 22px; height: 22px; }
+  .swatch { width: 36px; height: 36px; }
+  .back { padding: 10px 0; }
+  .seg-btn { padding: 6px 12px; }
+  .ed-idx { min-width: 2rem; min-height: 36px; }
+  .key-hint { display: none; } /* 手機沒有空白鍵 */
+  .toast { bottom: max(20px, calc(12px + env(safe-area-inset-bottom))); }
+}

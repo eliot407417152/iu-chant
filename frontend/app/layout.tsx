@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Gowun_Batang, Noto_Sans_TC } from "next/font/google";
 import { AdminProvider } from "@/components/AdminProvider";
 import TopBar from "@/components/TopBar";
@@ -20,6 +20,16 @@ const ui = Noto_Sans_TC({
 export const metadata: Metadata = {
   title: "IU 應援歌單",
   description: "IU 歌曲的空耳與應援法，邊看影片邊跟著唱。",
+};
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  // 手機瀏覽器網址列的顏色，跟著淺色／深色
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#14122a" },
+  ],
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

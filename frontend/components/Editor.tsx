@@ -379,23 +379,27 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
             <input type="number" min="1" step="1" value={order} onChange={(e) => setOrder(e.target.value)} />
           </label>
 
+          {/* 手機上影片與打點鈕會置頂，邊看邊打點、邊捲歌詞列表 */}
+          <div className="ed-stage">
           <div className="video">
             <div ref={containerRef} className="video-inner" />
             {!videoId && <p className="video-error">在上面填入「{VIDEO_LABEL[kind]}」的網址就會顯示在這裡</p>}
             {error && <p className="video-error" role="alert">{error}</p>}
           </div>
 
+          <div className="ed-stage-side">
           <p className="ed-editing">
             正在編輯：<strong>{VIDEO_LABEL[kind]}</strong> 的歌詞（{lines.length} 行）
           </p>
-
           <div className="ed-stamp">
             <button type="button" className="stamp-btn" onClick={stamp} disabled={!ready || cursor >= lines.length}>
-              打點（空白鍵）
+              打點<span className="key-hint">（空白鍵）</span>
             </button>
             <span className="muted">
               目前 {formatClock(now)}・下一行：第 {Math.min(cursor + 1, lines.length)} / {lines.length} 行
             </span>
+          </div>
+          </div>
           </div>
           <p className="muted ed-hint">
             每一行開始唱的瞬間按空白鍵（已自動提早 {LEAD_SEC} 秒）。上下方向鍵可移動目前行，也能直接改右邊的分與秒。
