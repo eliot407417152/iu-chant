@@ -8,7 +8,10 @@ import { formatClock } from "@/lib/format";
 import { extractVideoId, parseLyrics, type DraftLine } from "@/lib/parseLyrics";
 import { CHANT_LABEL, VIDEO_KINDS, VIDEO_LABEL, type Song, type VideoKind } from "@/lib/types";
 import { useAdmin } from "./AdminProvider";
+import LineEditor from "./LineEditor";
+import LineText from "./LineText";
 import TimeInput from "./TimeInput";
+import { colorsToSegs, segsToColors, splitColors } from "@/lib/richText";
 
 /** 按鍵總會比聽到慢一點，所以自動提早一點 */
 const LEAD_SEC = 0.3;
@@ -65,11 +68,14 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
   const offset = Number(vin[kind].offset) || 0;
   const { containerRef, ready, error, getTime, seekTo } = useYouTubePlayer(videoId);
 
+  // 後端用 startSec < 0 表示「還沒打點」的草稿行，編輯器裡顯示成空白
+  const draftify = (ls: Song["lyrics"][VideoKind]): DraftLine[] =>
+    ls.map((l) => (l.startSec < 0 ? { ...l, startSec: null } : l));
   const [linesBy, setLinesBy] = useState<Record<VideoKind, DraftLine[]>>(() => ({
-    chant: song.lyrics.chant,
-    mv: song.lyrics.mv,
-    inst: song.lyrics.inst,
-    live: song.lyrics.live,
+    chant: draftify(song.lyrics.chant),
+    mv: draftify(song.lyrics.mv),
+    inst: draftify(song.lyrics.inst),
+    live: draftify(song.lyrics.live),
   }));
   const [rawBy, setRawBy] = useState<Record<VideoKind, string>>(() => emptyBy(() => ""));
   const lines = linesBy[kind];
@@ -80,11 +86,13 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
   const [skipped, setSkipped] = useState(0);
   const [msg, setMsg] = useState<{ ok: boolean; text: string } | null>(null);
   const [saving, setSaving] = useState(false);
+  /** 目前展開行內編輯的那一行（沒有就是 null） */
+  const [editing, setEditing] = useState<number | null>(null);
 
   // 成功訊息幾秒後自動消失；錯誤訊息會一直留著，直到你關掉或再次操作
   useEffect(() => {
     if (!msg?.ok) return;
-    const id = setTimeout(() => setMsg(null), 5000);
+    const id = setTimeout(() => setMsg(null), 9000);
     return () => clearTimeout(id);
   }, [msg]);
 
@@ -143,6 +151,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
     setKind(k);
     setCursor(firstUnstamped(linesBy[k]));
     setSkipped(0);
+    setEditing(null);
     setMsg(null);
   };
 
@@ -151,6 +160,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
     setLines(() => r.lines);
     setSkipped(r.skippedNotes);
     setCursor(0);
+    setEditing(null);
     setMsg({ ok: true, text: `「${VIDEO_LABEL[kind]}」解析出 ${r.lines.length} 行，請開始打點。` });
   };
 
@@ -166,13 +176,91 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
     setLines((ls) => ls.map((l, idx) => (idx === i ? { ...l, startSec: value } : l)));
   };
 
+  // ===== 行內編輯：修改、新增、刪除、合併、拆行、移動 =====
+  const updateLine = (i: number, patch: Partial<DraftLine>) =>
+    setLines((ls) => ls.map((l, idx) => (idx === i ? { ...l, ...patch } : l)));
+
+  const insertLine = (i: number, line: DraftLine) => {
+    setLines((ls) => [...ls.slice(0, i), line, ...ls.slice(i)]);
+    setEditing(i);
+    setCursor(i);
+  };
+
+  const deleteLine = (i: number) => {
+    if (!window.confirm(`確定刪除第 ${i + 1} 行嗎？\n「${lines[i].text}」`)) return;
+    setLines((ls) => ls.filter((_, idx) => idx !== i));
+    setEditing(null);
+    setCursor((c) => Math.max(0, Math.min(c > i ? c - 1 : c, lines.length - 2)));
+  };
+
+  /** 上下移動：文字內容交換，但時間留在原位，這樣儲存時（依時間排序）順序不會被打亂 */
+  const moveLine = (i: number, dir: -1 | 1) => {
+    const j = i + dir;
+    if (j < 0 || j >= lines.length) return;
+    setLines((ls) => {
+      const next = ls.slice();
+      const a = ls[i];
+      const b = ls[j];
+      next[i] = { ...b, startSec: a.startSec };
+      next[j] = { ...a, startSec: b.startSec };
+      return next;
+    });
+    setEditing(j);
+  };
+
+  const mergeNext = (i: number) => {
+    const a = lines[i];
+    const b = lines[i + 1];
+    if (!b) return;
+    const join = (x?: string, y?: string) => [x, y].filter(Boolean).join(" ") || undefined;
+    const text = a.text && b.text ? `${a.text} ${b.text}` : a.text || b.text;
+    const colors = [
+      ...segsToColors(a.text, a.segs),
+      ...(a.text && b.text ? [undefined] : []),
+      ...segsToColors(b.text, b.segs),
+    ];
+    const merged: DraftLine = {
+      startSec: a.startSec ?? b.startSec,
+      text,
+      roman: join(a.roman, b.roman),
+      sub: join(a.sub, b.sub),
+      chant: a.chant ?? b.chant,
+      segs: colorsToSegs(text, colors),
+    };
+    setLines((ls) => [...ls.slice(0, i), merged, ...ls.slice(i + 2)]);
+    setEditing(i);
+    setCursor((c) => (c > i ? c - 1 : c));
+    setMsg({ ok: true, text: `已把第 ${i + 1}、${i + 2} 行合併（時間用第 ${i + 1} 行的）。` });
+  };
+
+  const splitLine = (i: number, at: number) => {
+    const l = lines[i];
+    const { leftText, rightText, leftColors, rightColors } = splitColors(l.text, segsToColors(l.text, l.segs), at);
+    const left: DraftLine = { ...l, text: leftText.trimEnd(), segs: colorsToSegs(leftText.trimEnd(), leftColors.slice(0, leftText.trimEnd().length)) };
+    const trimmed = rightText.trimStart();
+    const right: DraftLine = {
+      startSec: null,
+      text: trimmed,
+      chant: l.chant,
+      segs: colorsToSegs(trimmed, rightColors.slice(rightText.length - trimmed.length)),
+    };
+    setLines((ls) => [...ls.slice(0, i), left, right, ...ls.slice(i + 1)]);
+    setEditing(i + 1);
+    setCursor(i + 1);
+    setMsg({ ok: true, text: `已拆成兩行。新的第 ${i + 2} 行還沒有時間，請打點或直接輸入。` });
+  };
+
+  const duplicateLine = (i: number) => insertLine(i + 1, { ...lines[i], startSec: null });
+
+  const addLine = (i: number) => insertLine(i, { startSec: null, text: "" });
+
   const buildBody = () => {
     const vid = (k: VideoKind) => {
       const id = extractVideoId(vin[k].input);
       return id ? { id, offsetSec: Number(vin[k].offset) || 0 } : undefined;
     };
     const ly = (k: VideoKind) =>
-      linesBy[k].map((l) => ({ startSec: l.startSec, text: l.text, roman: l.roman, sub: l.sub, chant: l.chant }));
+      linesBy[k].map((l) => ({ startSec: l.startSec ?? -1, text: l.text, roman: l.roman, sub: l.sub, chant: l.chant, segs: l.segs }));
     return {
       chant: vid("chant"),
       mv: vid("mv"),
@@ -194,14 +282,14 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
       return setMsg({ ok: false, text: "應援歌單順序必須是 1 以上的整數，或留空。" });
     }
     for (const k of VIDEO_KINDS) {
-      const missing = linesBy[k].findIndex((l) => l.startSec == null);
-      if (missing >= 0) {
+      const empty = linesBy[k].findIndex((l) => !l.text.trim());
+      if (empty >= 0) {
         switchKind(k);
-        setCursor(missing);
-        return setMsg({ ok: false, text: `「${VIDEO_LABEL[k]}」第 ${missing + 1} 行還沒有打點。` });
+        setCursor(empty);
+        setEditing(empty);
+        return setMsg({ ok: false, text: `「${VIDEO_LABEL[k]}」第 ${empty + 1} 行是空的，請填入文字或刪除這一行。` });
       }
     }
-
     setSaving(true);
     try {
       const res = await fetch(`${PUBLIC_API_URL}/api/admin/songs/${encodeURIComponent(song.id)}/content`, {
@@ -211,7 +299,13 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
       });
       if (res.ok) {
         const t = new Date().toLocaleTimeString("zh-TW", { hour12: false });
-        setMsg({ ok: true, text: `✓ 已儲存（${t}）。可以回到歌曲頁看結果。` });
+        const pending = VIDEO_KINDS.map((k) => ({ k, n: linesBy[k].filter((l) => l.startSec == null).length })).filter((x) => x.n > 0);
+        setMsg({
+          ok: true,
+          text: pending.length
+            ? `✓ 已儲存（${t}）。還有未打點的行：${pending.map((x) => `${VIDEO_LABEL[x.k]} ${x.n} 行`).join("、")}。下次回來會接著編輯；打完點之前，公開的歌曲頁不會顯示那個版本的歌詞。`
+            : `✓ 已儲存（${t}）。可以回到歌曲頁看結果。`,
+        });
       }
       else if (res.status === 401) {
         setMsg({ ok: false, text: "管理金鑰已失效，請重新登入。" });
@@ -351,6 +445,9 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
             <p className="empty">
               「{VIDEO_LABEL[kind]}」還沒有歌詞。貼上歌詞並按「解析」，或從其他版本帶入，會顯示在這裡。
               只設定影片的話，可以直接按儲存。
+              <button type="button" className="btn ed-first" onClick={() => insertLine(0, { startSec: null, text: "" })}>
+                ＋ 手動新增第一行
+              </button>
             </p>
           ) : (
             <ol className="ed-lines">
@@ -367,21 +464,57 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
                   <span className="ed-text">
                     {l.chant && <span className="line-tag">{CHANT_LABEL[l.chant]}</span>}
                     {l.roman && <span className="line-roman">{l.roman}</span>}
-                    <span className="line-text">{l.text}</span>
+                    {l.text ? <LineText text={l.text} segs={l.segs} /> : <span className="line-text muted">（空白行，按「編輯」填入文字）</span>}
                     {l.sub && <span className="line-sub">{l.sub}</span>}
                   </span>
                   <TimeInput value={l.startSec} onChange={(v) => setStart(i, v)} label={`第 ${i + 1} 行開始時間`} />
-                  <button
-                    type="button"
-                    className="btn"
-                    disabled={l.startSec == null || !ready}
-                    onClick={() => seekTo(Math.max(0, (l.startSec as number) - offset))}
-                  >
-                    播放
-                  </button>
+                  <span className="ed-row-btns">
+                    <button
+                      type="button"
+                      className="btn"
+                      disabled={l.startSec == null || !ready}
+                      onClick={() => seekTo(Math.max(0, (l.startSec as number) - offset))}
+                    >
+                      播放
+                    </button>
+                    <button
+                      type="button"
+                      className={editing === i ? "btn is-on" : "btn"}
+                      aria-expanded={editing === i}
+                      onClick={() => {
+                        setEditing(editing === i ? null : i);
+                        setCursor(i);
+                      }}
+                    >
+                      {editing === i ? "收合" : "編輯"}
+                    </button>
+                  </span>
+                  {editing === i && (
+                    <LineEditor
+                      line={l}
+                      index={i}
+                      total={lines.length}
+                      onChange={(patch) => updateLine(i, patch)}
+                      onMove={(d) => moveLine(i, d)}
+                      onAdd={(w) => addLine(w === "above" ? i : i + 1)}
+                      onMergeNext={() => mergeNext(i)}
+                      onSplit={(at) => splitLine(i, at)}
+                      onDuplicate={() => duplicateLine(i)}
+                      onDelete={() => deleteLine(i)}
+                      onClose={() => setEditing(null)}
+                    />
+                  )}
                 </li>
               ))}
             </ol>
+          )}
+          {lines.length > 0 && (
+            <div className="ed-list-foot">
+              <button type="button" className="btn" onClick={() => insertLine(lines.length, { startSec: null, text: "" })}>
+                ＋ 在最後新增一行
+              </button>
+              <span className="muted">按每行右邊的「編輯」可改字、改顏色、合併、拆行、刪除。</span>
+            </div>
           )}
         </section>
       </div>

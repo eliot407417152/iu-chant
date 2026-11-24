@@ -44,6 +44,10 @@ public class LyricLine {
     @Column(name = "chant_type", length = 10)
     private ChantType chantType;
 
+    /** 同一行裡不同顏色的文字片段（JSON，例如 [{"text":"사랑","color":"sing"}]）；null 代表整行同一個顏色 */
+    @Column(name = "rich_json", length = 2000)
+    private String richJson;
+
     public Long getId() { return id; }
     public Song getSong() { return song; }
     public void setSong(Song song) { this.song = song; }
@@ -63,4 +67,6 @@ public class LyricLine {
     public void setSub(String sub) { this.sub = sub; }
     public ChantType getChantType() { return chantType; }
     public void setChantType(ChantType chantType) { this.chantType = chantType; }
+    public String getRichJson() { return richJson; }
+    public void setRichJson(String richJson) { this.richJson = richJson; }
 }

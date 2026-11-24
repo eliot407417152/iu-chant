@@ -10,12 +10,22 @@ import java.util.List;
 public final class SongDtos {
     private SongDtos() {}
 
+    /** 一行裡的一段文字與它的顏色（color 是顏色代號如 sing、call，或 #rrggbb；null 代表預設色） */
+    public record SegDto(
+            @NotNull @Size(max = 500) String text,
+            @Size(max = 20) @Pattern(regexp = "^[A-Za-z0-9#]*$") String color,
+            /** 顯示在這段文字正上方、與它對齊的標註（例如要喊的 I U） */
+            @Size(max = 100) String note,
+            @Size(max = 20) @Pattern(regexp = "^[A-Za-z0-9#]*$") String noteColor) {}
+
     public record LyricLineDto(
-            @PositiveOrZero double startSec,
+            /** 還沒打點的草稿行用 -1 表示；其餘必須 >= 0 */
+            @DecimalMin("-1") double startSec,
             @NotBlank @Size(max = 500) String text,
             @Size(max = 500) String roman,
             @Size(max = 500) String sub,
-            ChantType chant) {}
+            ChantType chant,
+            @Valid @Size(max = 100) List<SegDto> segs) {}
 
     /** 一支 YouTube 影片。歌詞時間 = 播放時間 + offsetSec */
     public record VideoDto(

@@ -1,5 +1,15 @@
 export type ChantType = "sing" | "call" | "cheer" | "clap" | "quiet" | "all";
 
+/** 一行裡的一段文字；color 是顏色代號（見 lib/richText.ts 的 PALETTE）或 #rrggbb，沒有代表預設色 */
+export interface Seg {
+  text: string;
+  color?: string;
+  /** 顯示在這段文字正上方、並與它對齊的標註（例如要喊的「I U」） */
+  note?: string;
+  /** 標註的顏色；沒有就用預設的喊口號色 */
+  noteColor?: string;
+}
+
 export interface LyricLine {
   /** 這一行開始的秒數 */
   startSec: number;
@@ -11,6 +21,8 @@ export interface LyricLine {
   sub?: string;
   /** 有值代表這一行是應援（用不同顏色顯示） */
   chant?: ChantType;
+  /** 同一行裡不同顏色的片段（組合起來等於 text）；沒有代表整行同一個顏色 */
+  segs?: Seg[];
 }
 
 export const CHANT_LABEL: Record<ChantType, string> = {

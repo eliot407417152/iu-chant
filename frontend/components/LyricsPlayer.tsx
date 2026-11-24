@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
+import LineText from "./LineText";
 import {
   CHANT_LABEL,
   VIDEO_KINDS,
@@ -47,7 +48,14 @@ interface Props {
   queueLabel: string;
 }
 
-export default function LyricsPlayer({ videos, lyrics, autoplay, prev, next, queueLabel }: Props) {
+/** 還有沒打點的行（startSec < 0，編輯到一半的草稿）的版本，公開頁先當作「整理中」，不顯示 */
+function publicLyrics(all: Lyrics): Lyrics {
+  const ok = (ls: LyricLine[]) => (ls.some((l) => l.startSec < 0) ? [] : ls);
+  return { chant: ok(all.chant), mv: ok(all.mv), inst: ok(all.inst), live: ok(all.live) };
+}
+
+export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev, next, queueLabel }: Props) {
+  const lyrics = useMemo(() => publicLyrics(rawLyrics), [rawLyrics]);
   const router = useRouter();
   const kinds = VIDEO_KINDS.filter((k) => videos[k]);
   const [kind, setKind] = useState<VideoKind>(kinds[0]);
@@ -233,7 +241,7 @@ export default function LyricsPlayer({ videos, lyrics, autoplay, prev, next, que
                 >
                   {line.chant && <span className="line-tag">{CHANT_LABEL[line.chant]}</span>}
                   {line.roman && <span className="line-roman">{line.roman}</span>}
-                  <span className="line-text">{line.text}</span>
+                  <LineText text={line.text} segs={line.segs} />
                   {showSub && line.sub && <span className="line-sub">{line.sub}</span>}
                 </button>
               </li>

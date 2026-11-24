@@ -136,30 +136,40 @@ button { font: inherit; color: inherit; }
   position: sticky; top: 0; z-index: 6; margin-top: 16px; padding: 10px 0;
   background: color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter: blur(10px);
   border-bottom: 1px solid var(--line);
-  /* 版面固定：左邊分類、右邊「跳到專輯／排序」。寬度不夠時，固定換成上下兩列，不會隨選項亂跑 */
-  display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 8px 16px; align-items: center;
+  /* 分類按鈕一律獨佔第一列、可左右滑動；「跳到專輯／排序」固定在第二列，絕不會蓋住分類按鈕 */
+  display: grid; grid-template-columns: minmax(0, 1fr); gap: 8px; align-items: center;
 }
-.filters, .browse-actions { display: flex; flex-wrap: nowrap; gap: 8px; align-items: center; }
-.filters { overflow-x: auto; scrollbar-width: none; padding: 2px; }
+.filters, .browse-actions { display: flex; flex-wrap: nowrap; gap: 6px; align-items: center; min-width: 0; }
+.filters {
+  overflow-x: auto; overscroll-behavior-x: contain; -webkit-overflow-scrolling: touch;
+  scrollbar-width: none; padding: 2px; scroll-snap-type: x proximity;
+  /* 右邊淡出，提示還可以往左滑 */
+  mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  -webkit-mask-image: linear-gradient(to right, #000 calc(100% - 28px), transparent);
+  padding-right: 28px;
+}
+/* 寬螢幕時分類放得下，就不需要淡出遮罩 */
+@media (min-width: 900px) {
+  .filters { mask-image: none; -webkit-mask-image: none; padding-right: 2px; }
+}
 .filters::-webkit-scrollbar { display: none; }
+.browse-actions { justify-content: flex-start; }
 .browse-actions.is-hidden { visibility: hidden; }
 .filter {
-  flex: 0 0 auto; white-space: nowrap;
+  flex: 0 0 auto; white-space: nowrap; scroll-snap-align: start;
   border: 1px solid var(--line); background: var(--surface); color: var(--ink);
-  padding: 6px 14px; border-radius: 999px; cursor: pointer; font-weight: 500;
+  padding: 5px 11px; border-radius: 999px; cursor: pointer; font-weight: 500;
+  font-size: clamp(.78rem, 2.9vw, .92rem);
 }
 .filter:hover { border-color: var(--accent); }
 /* 選中時不改字重，避免按鈕變寬而推動旁邊的元素 */
 .filter.is-on { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
 .jump {
-  flex: 0 0 auto; width: 12rem;
-  font: inherit; color: var(--ink); background: var(--surface);
-  border: 1px solid var(--line); border-radius: 999px; padding: 6px 12px;
+  flex: 1 1 10rem; min-width: 0; max-width: 16rem;
+  font: inherit; font-size: .88rem; color: var(--ink); background: var(--surface);
+  border: 1px solid var(--line); border-radius: 999px; padding: 5px 12px;
 }
-.sort-btn { flex: 0 0 auto; white-space: nowrap; min-width: 8.5rem; }
-@media (max-width: 1000px) {
-  .browse-bar { grid-template-columns: minmax(0, 1fr); }
-}
+.sort-btn { flex: 0 0 auto; white-space: nowrap; font-size: .88rem; }
 
 .playlist-card {
   margin-top: 22px; padding: 20px 22px; border-radius: 18px; color: var(--accent-ink);
@@ -339,6 +349,36 @@ button { font: inherit; color: inherit; }
 .ed-text { display: flex; flex-direction: column; min-width: 0; color: var(--ink-2); }
 .ed-text .line-text { font-size: 1rem; }
 .ed-time { padding: 4px 6px; }
+.ed-row-btns { display: inline-flex; gap: 6px; }
+.btn.is-on { background: var(--accent); color: var(--accent-ink); }
+.btn-sm { padding: 3px 10px; font-size: .85rem; }
+.btn-danger { color: var(--c-sing); border-color: var(--c-sing); }
+.btn-danger:hover:not(:disabled) { background: var(--c-sing); color: var(--bg); }
+.ed-edit {
+  grid-column: 1 / -1; display: flex; flex-direction: column; gap: 10px; padding: 12px;
+  margin-top: 4px; border: 1px solid var(--line); border-radius: 12px; background: var(--surface-2);
+}
+.ed-edit-field { display: flex; flex-direction: column; gap: 4px; font-size: .85rem; color: var(--muted); }
+.ed-edit-field input, .ed-edit-field select {
+  font: inherit; font-size: 1rem; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 7px 10px; min-width: 0;
+}
+.ed-edit-two { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; }
+.ed-edit-type { max-width: 20rem; }
+.ed-colors { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; font-size: .85rem; }
+.swatch {
+  width: 26px; height: 26px; border-radius: 50%; border: 2px solid var(--line); cursor: pointer; padding: 0;
+  display: inline-flex; overflow: hidden; position: relative;
+}
+.swatch:hover { border-color: var(--ink); transform: scale(1.1); }
+.swatch-custom { background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red); }
+.swatch-custom input { opacity: 0; width: 100%; height: 100%; cursor: pointer; border: 0; padding: 0; }
+.ed-preview { padding: 8px 12px; border-radius: 8px; background: var(--bg); border: 1px dashed var(--line); }
+.ed-preview .line-text { font-size: 1.15rem; }
+.ed-hint-warn { margin: 0; font-size: .85rem; color: var(--c-call); font-weight: 600; }
+.ed-edit-actions { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.ed-list-foot { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-top: 10px; font-size: .9rem; }
+.ed-first { margin-left: 10px; }
 
 @media (min-width: 900px) {
   .song-grid { grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
@@ -357,7 +397,8 @@ button { font: inherit; color: inherit; }
   .ed-radio { grid-column: 1 / -1; }
   .ed-row { grid-template-columns: 2rem minmax(0, 1fr) auto; }
   .ed-row .time-input { grid-column: 2; }
-  .ed-row > .btn { grid-column: 3; grid-row: 2; }
+  .ed-row > .ed-row-btns { grid-column: 3; grid-row: 2; }
+  .ed-edit-two { grid-template-columns: minmax(0, 1fr); }
 }
 
 
@@ -428,3 +469,14 @@ button { font: inherit; color: inherit; }
 }
 .cover-thumb-empty { display: grid; place-items: center; font-size: .75rem; color: var(--muted); }
 .cover-editor-actions { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+
+/* ===== 字上方的標註（ruby）：標註置中對齊在那段字的正上方 ===== */
+.seg-ruby { ruby-position: over; ruby-align: center; }
+.seg-ruby rt { font-size: .55em; font-weight: 700; letter-spacing: .04em; line-height: 1.2; }
+.has-ruby { line-height: 1.9; }
+.is-active .has-ruby { line-height: 2; }
+.ed-note-input {
+  font: inherit; font-size: .95rem; width: 8rem; color: var(--ink); background: var(--bg);
+  border: 1px solid var(--line); border-radius: 8px; padding: 4px 8px;
+}
+.ed-notes select { font: inherit; font-size: .9rem; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 4px 6px; }

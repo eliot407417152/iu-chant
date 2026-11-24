@@ -1,6 +1,9 @@
 package com.example.iuchant.song;
 
 import com.example.iuchant.song.SongDtos.*;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -13,6 +16,7 @@ import java.util.List;
 public class SongService {
 
     private final SongRepository repo;
+    private static final ObjectMapper JSON = new ObjectMapper();
 
     public SongService(SongRepository repo) {
         this.repo = repo;
@@ -47,9 +51,12 @@ public class SongService {
         song.getLines().clear();
         boolean hasChant = false;
         for (VideoKind kind : VideoKind.values()) {
-            List<LyricLineDto> sorted = (lyrics == null ? List.<LyricLineDto>of() : lyrics.of(kind)).stream()
-                    .sorted(Comparator.comparingDouble(LyricLineDto::startSec))
-                    .toList();
+            List<LyricLineDto> given = lyrics == null ? List.<LyricLineDto>of() : lyrics.of(kind);
+            // 全部都打好點才依時間排序；還有草稿行（startSec < 0）時照編輯器的順序存，才不會把行順序打亂
+            boolean draft = given.stream().anyMatch(d -> d.startSec() < 0);
+            List<LyricLineDto> sorted = draft
+                    ? given
+                    : given.stream().sorted(Comparator.comparingDouble(LyricLineDto::startSec)).toList();
             int no = 1;
             for (LyricLineDto d : sorted) {
                 LyricLine l = new LyricLine();
@@ -61,6 +68,7 @@ public class SongService {
                 l.setRoman(blankToNull(d.roman()));
                 l.setSub(blankToNull(d.sub()));
                 l.setChantType(d.chant());
+                l.setRichJson(segsToJson(d.segs()));
                 if (d.chant() != null) hasChant = true;
                 song.getLines().add(l);
             }
@@ -105,7 +113,28 @@ public class SongService {
     }
 
     private LyricLineDto toDto(LyricLine l) {
-        return new LyricLineDto(l.getStartSec(), l.getText(), l.getRoman(), l.getSub(), l.getChantType());
+        return new LyricLineDto(l.getStartSec(), l.getText(), l.getRoman(), l.getSub(), l.getChantType(),
+                jsonToSegs(l.getRichJson()));
+    }
+
+    /** 只有真的有顏色時才存；全部都是預設色就當成沒有 */
+    private static String segsToJson(List<SegDto> segs) {
+        if (segs == null || segs.stream().noneMatch(g -> (g.color() != null && !g.color().isBlank()) || (g.note() != null && !g.note().isBlank()))) return null;
+        try {
+            String json = JSON.writeValueAsString(segs);
+            return json.length() <= 2000 ? json : null;
+        } catch (JsonProcessingException e) {
+            return null;
+        }
+    }
+
+    private static List<SegDto> jsonToSegs(String json) {
+        if (json == null || json.isBlank()) return null;
+        try {
+            return JSON.readValue(json, new TypeReference<List<SegDto>>() {});
+        } catch (JsonProcessingException e) {
+            return null;
+        }
     }
 
     private static String blankToNull(String s) {
