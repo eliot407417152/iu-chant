@@ -2,6 +2,7 @@ package com.example.iuchant.backup;
 
 import com.example.iuchant.album.AlbumType;
 import com.example.iuchant.song.SongDtos.LyricsDto;
+import com.example.iuchant.song.SongDtos.PlainDto;
 import com.example.iuchant.song.SongDtos.VideoDto;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
@@ -27,7 +28,9 @@ public final class BackupDtos {
             @Valid VideoDto mv,
             @Valid VideoDto inst,
             @Valid VideoDto live,
-            @Valid LyricsDto lyrics) {}
+            @Valid LyricsDto lyrics,
+            /** 「只有歌詞」的版本；舊備份檔沒有這個欄位，視為每個版本都要打點 */
+            PlainDto plain) {}
 
     public record BackupAlbum(
             @NotBlank String slug,

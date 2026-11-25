@@ -5,7 +5,9 @@ import { useState } from "react";
 import type { Album } from "@/lib/types";
 import { formatDate } from "@/lib/format";
 import { useAdmin } from "./AdminProvider";
+import AlbumAdminPanel from "./AlbumAdminPanel";
 import BackupPanel from "./BackupPanel";
+import ChantListManager from "./ChantListManager";
 import CoverEditor from "./CoverEditor";
 
 export default function AdminHome({ albums }: { albums: Album[] }) {
@@ -59,11 +61,13 @@ export default function AdminHome({ albums }: { albums: Album[] }) {
       <header className="song-head">
         <h1>管理員模式</h1>
         <p className="muted">
-          共 {all.length} 首・已有影片 {withVideo} 首・已整理應援法 {withChant} 首・應援歌單 {inList} 首。點任何一首進入編輯。
+          共 {all.length} 首・已有影片 {withVideo} 首・已整理應援法 {withChant} 首・應援歌單 {inList} 首。
+          點任何一首進入編輯（影片、歌詞，以及曲名、專輯、主打、Feat.、備註這些清單資料）；專輯標題下面可以改專輯資料、新增歌曲。
         </p>
       </header>
 
       <BackupPanel adminKey={adminKey} onAuthFail={logout} />
+      <ChantListManager key={albums.map((a) => a.songs.map((x) => `${x.id}:${x.chantOrder ?? ""}`).join(",")).join(";")} albums={albums} adminKey={adminKey} onAuthFail={logout} />
 
       {newestFirst.map((album) => (
         <section key={album.id} className="album">
@@ -79,6 +83,12 @@ export default function AdminHome({ albums }: { albums: Album[] }) {
             onAuthFail={logout}
             onChange={(url) => setCovers((c) => ({ ...c, [album.id]: url ?? null }))}
           />
+          <AlbumAdminPanel
+            key={`${album.title}|${album.type}|${album.typeLabel}|${album.releaseDate}|${album.note ?? ""}`}
+            album={album}
+            adminKey={adminKey}
+            onAuthFail={logout}
+          />
           <ol className="tracks">
             {album.songs.map((s) => (
               <li key={s.id}>
@@ -86,8 +96,12 @@ export default function AdminHome({ albums }: { albums: Album[] }) {
                   <span className="track-no">{s.trackNo}</span>
                   <span className="track-main">
                     <span className="track-title">{s.title}</span>
+                    {(s.featuring || s.note) && (
+                      <span className="track-sub">{[s.featuring, s.note].filter(Boolean).join("・")}</span>
+                    )}
                   </span>
                   <span className="track-tags">
+                    {s.isTitleTrack && <span className="tag">主打</span>}
                     {s.chantOrder != null && <span className="tag">應援歌單 #{s.chantOrder}</span>}
                     {s.hasChant && <span className="chip chip-all">應援法</span>}
                     {s.hasVideo ? <span className="tag">有影片</span> : <span className="muted">尚無影片</span>}

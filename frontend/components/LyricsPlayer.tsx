@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 import LineText from "./LineText";
@@ -10,8 +9,10 @@ import {
   VIDEO_KINDS,
   VIDEO_LABEL,
   type ChantType,
+  NO_PLAIN,
   type LyricLine,
   type Lyrics,
+  type PlainFlags,
   type VideoKind,
   type Videos,
 } from "@/lib/types";
@@ -34,29 +35,50 @@ function findActive(lines: LyricLine[], t: number): number {
 }
 
 interface Neighbor {
+  id: string;
   href: string;
   title: string;
 }
 
 interface Props {
+  /** 目前的歌曲 id；換歌時播放器會沿用，只重設這首歌的狀態 */
+  songKey: string;
   videos: Videos;
   lyrics: Lyrics;
-  /** 進入頁面時是否自動播放（從上一首連播過來，或按了「播放全部」） */
+  /** 「只有歌詞、不打點」的版本 */
+  plain?: PlainFlags;
+  /** 這次載入是否要自動播放（從上一首連播過來，或按了「播放全部」） */
   autoplay: boolean;
   prev?: Neighbor;
   next?: Neighbor;
+  /** 切換到另一首歌（不重新載入頁面，播放器才能沿用，手機才不會被擋自動播放） */
+  onNavigate: (id: string) => void;
   queueLabel: string;
 }
 
-/** 還有沒打點的行（startSec < 0，編輯到一半的草稿）的版本，公開頁先當作「整理中」，不顯示 */
-function publicLyrics(all: Lyrics): Lyrics {
-  const ok = (ls: LyricLine[]) => (ls.some((l) => l.startSec < 0) ? [] : ls);
-  return { chant: ok(all.chant), mv: ok(all.mv), inst: ok(all.inst), live: ok(all.live) };
+/**
+ * 公開頁能顯示的歌詞：
+ * - 還有沒打點的行（startSec < 0，編輯到一半的草稿）的版本，先當作「整理中」，不顯示
+ * - 但「只有歌詞」的版本本來就不打點，照樣顯示
+ */
+function publicLyrics(all: Lyrics, plain: PlainFlags): Lyrics {
+  const ok = (k: VideoKind) => (!plain[k] && all[k].some((l) => l.startSec < 0) ? [] : all[k]);
+  return { chant: ok("chant"), mv: ok("mv"), inst: ok("inst"), live: ok("live") };
 }
 
-export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev, next, queueLabel }: Props) {
-  const lyrics = useMemo(() => publicLyrics(rawLyrics), [rawLyrics]);
-  const router = useRouter();
+export default function LyricsPlayer({
+  songKey,
+  videos,
+  lyrics: rawLyrics,
+  plain: plainProp,
+  autoplay,
+  prev,
+  next,
+  onNavigate,
+  queueLabel,
+}: Props) {
+  const plain = plainProp ?? NO_PLAIN;
+  const lyrics = useMemo(() => publicLyrics(rawLyrics, plain), [rawLyrics, plain]);
   const kinds = VIDEO_KINDS.filter((k) => videos[k]);
   const [kind, setKind] = useState<VideoKind>(kinds[0]);
   const source = videos[kind] ?? videos[kinds[0]]!;
@@ -65,12 +87,25 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
   const ownLines = lyrics[kind];
   const borrowFrom = ownLines.length === 0 ? VIDEO_KINDS.find((k) => lyrics[k].length > 0) : undefined;
   const lines: LyricLine[] = borrowFrom ? lyrics[borrowFrom] : ownLines;
+  /** 目前顯示的歌詞是不是「只有歌詞」：是的話不跟著影片、不能點歌詞跳轉 */
+  const isPlain = plain[borrowFrom ?? kind];
 
   const [wantAutoplay, setWantAutoplay] = useState(autoplay);
-  const [autoNext, setAutoNext] = useState(true);
-  const [repeatOne, setRepeatOne] = useState(false);
+  const [needTap, setNeedTap] = useState(false);
   const [active, setActive] = useState(-1);
   const [follow, setFollow] = useState(true);
+  const [shownSong, setShownSong] = useState(songKey);
+  // 換歌：播放器沿用，只重設這首歌自己的狀態（在 render 中重設，避免閃一下舊歌的歌詞）
+  if (shownSong !== songKey) {
+    setShownSong(songKey);
+    setKind(kinds[0]);
+    setActive(-1);
+    setFollow(true);
+    setWantAutoplay(autoplay);
+    setNeedTap(false);
+  }
+  const [autoNext, setAutoNext] = useState(true);
+  const [repeatOne, setRepeatOne] = useState(false);
   const [showSub, setShowSub] = useState(true);
   const listRef = useRef<HTMLOListElement>(null);
   const seekRef = useRef<(sec: number) => void>(() => {});
@@ -82,25 +117,40 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
     } catch {}
   }, []);
 
-  const { containerRef, ready, playing, error, getTime, seekTo } = useYouTubePlayer(source.id, {
+  const { containerRef, ready, playing, error, getTime, seekTo, play } = useYouTubePlayer(source.id, {
     autoplay: wantAutoplay,
     onEnded: () => {
       if (repeatOne) seekRef.current(0);
-      else if (autoNext && next) router.push(next.href);
+      else if (autoNext && next) onNavigate(next.id);
     },
   });
   seekRef.current = seekTo;
 
+  // 手機瀏覽器常常擋掉第一次的自動播放：要求自動播放卻沒有開始播時，顯示「點一下開始播放」
+  const playingRef = useRef(playing);
+  playingRef.current = playing;
+  useEffect(() => {
+    setNeedTap(false);
+    if (!wantAutoplay || !ready) return;
+    const id = setTimeout(() => {
+      if (!playingRef.current) setNeedTap(true);
+    }, 1800);
+    return () => clearTimeout(id);
+  }, [wantAutoplay, ready, source.id]);
+  useEffect(() => {
+    if (playing) setNeedTap(false);
+  }, [playing]);
+
   // 每 200ms 讀一次播放秒數（加上這支影片的偏移）；index 沒變時 React 不會重新渲染
   useEffect(() => {
-    if (!ready) return;
+    if (!ready || isPlain) return;
     const id = setInterval(() => setActive(findActive(lines, getTime() + source.offsetSec)), 200);
     return () => clearInterval(id);
-  }, [ready, lines, getTime, source.offsetSec]);
+  }, [ready, isPlain, lines, getTime, source.offsetSec]);
 
   // 自動捲動：只捲歌詞容器，不會把整個頁面往上拉
   useEffect(() => {
-    if (!follow || active < 0) return;
+    if (isPlain || !follow || active < 0) return;
     const list = listRef.current;
     const el = list?.children[active] as HTMLElement | undefined;
     if (!list || !el) return;
@@ -109,9 +159,12 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
       top: el.offsetTop - list.clientHeight / 2 + el.clientHeight / 2,
       behavior: reduce ? "auto" : "smooth",
     });
-  }, [active, follow]);
+  }, [active, follow, isPlain]);
 
-  const nextChant = useMemo(() => lines.find((l, i) => i > active && l.chant) ?? null, [lines, active]);
+  const nextChant = useMemo(
+    () => (isPlain ? null : (lines.find((l, i) => i > active && l.chant) ?? null)),
+    [lines, active, isPlain],
+  );
   const usedTypes = useMemo(
     () => [...new Set(lines.map((l) => l.chant).filter((c): c is ChantType => !!c))],
     [lines],
@@ -129,6 +182,13 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
     setWantAutoplay(true);
     setActive(-1);
     setKind(k);
+  };
+
+  /** 一般點擊（沒按 Ctrl/Cmd/Shift、不是中鍵）時，不重新載入頁面，直接切換歌曲 */
+  const go = (e: React.MouseEvent, id: string) => {
+    if (e.metaKey || e.ctrlKey || e.shiftKey || e.altKey || e.button !== 0) return;
+    e.preventDefault();
+    onNavigate(id);
   };
 
   const handleSeek = (sec: number) => {
@@ -161,6 +221,19 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
         <div className="video">
           <div ref={containerRef} className="video-inner" />
           {error && <p className="video-error" role="alert">{error}</p>}
+          {needTap && !error && (
+            <button
+              type="button"
+              className="tap-play"
+              onClick={() => {
+                play();
+                setNeedTap(false);
+              }}
+            >
+              ▶ 點一下開始播放
+              <span>手機瀏覽器會擋自動播放，點過一次後，下一首就會自動接著播</span>
+            </button>
+          )}
         </div>
 
         <div className="cue" aria-live="polite">
@@ -170,15 +243,25 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
               <span className="cue-text">接下來：{nextChant.text}</span>
             </>
           ) : (
-            <span className="cue-text muted">{playing ? "後面沒有應援了" : "按下播放，開始跟著唱"}</span>
+            <span className="cue-text muted">
+              {isPlain ? "這個版本只有歌詞（沒有對時間）" : playing ? "後面沒有應援了" : "按下播放，開始跟著唱"}
+            </span>
           )}
         </div>
         </div>
 
         <div className="player-nav">
-          {prev ? <Link href={prev.href} className="pill nav-pill">‹ {prev.title}</Link> : <span />}
+          {prev ? (
+            <Link href={prev.href} className="pill nav-pill" onClick={(e) => go(e, prev.id)}>‹ {prev.title}</Link>
+          ) : (
+            <span />
+          )}
           <span className="muted nav-label">{queueLabel}</span>
-          {next ? <Link href={next.href} className="pill nav-pill">{next.title} ›</Link> : <span />}
+          {next ? (
+            <Link href={next.href} className="pill nav-pill" onClick={(e) => go(e, next.id)}>{next.title} ›</Link>
+          ) : (
+            <span />
+          )}
         </div>
 
         <div className="player-opts">
@@ -199,7 +282,7 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
             <input type="checkbox" checked={showSub} onChange={(e) => setShowSub(e.target.checked)} />
             顯示翻譯
           </label>
-          {!follow && (
+          {!isPlain && !follow && (
             <button type="button" className="btn" onClick={() => setFollow(true)}>
               回到目前這句
             </button>
@@ -208,7 +291,8 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
 
         {borrowFrom && (
           <p className="borrow-note" role="note">
-            「{VIDEO_LABEL[kind]}」的歌詞還在整理中，目前先顯示「{VIDEO_LABEL[borrowFrom]}」的歌詞，時間可能對不上。
+            「{VIDEO_LABEL[kind]}」的歌詞還在整理中，目前先顯示「{VIDEO_LABEL[borrowFrom]}」的歌詞
+            {isPlain ? "。" : "，時間可能對不上。"}
           </p>
         )}
 
@@ -225,28 +309,37 @@ export default function LyricsPlayer({ videos, lyrics: rawLyrics, autoplay, prev
         ) : (
           <ol
             ref={listRef}
-            className="lyrics"
+            className={isPlain ? "lyrics lyrics-plain" : "lyrics"}
             onWheel={() => setFollow(false)}
             onTouchMove={() => setFollow(false)}
           >
             {lines.map((line, i) => (
               <li
                 key={i}
-                className={["line", i === active ? "is-active" : "", line.chant ? `has-chant c-${line.chant}` : ""]
+                className={["line", !isPlain && i === active ? "is-active" : "", line.chant ? `has-chant c-${line.chant}` : ""]
                   .join(" ")
                   .trim()}
               >
-                <button
-                  type="button"
-                  className="line-btn"
-                  aria-current={i === active ? "true" : undefined}
-                  onClick={() => handleSeek(line.startSec)}
-                >
-                  {line.chant && <span className="line-tag">{CHANT_LABEL[line.chant]}</span>}
-                  {line.roman && <span className="line-roman">{line.roman}</span>}
-                  <LineText text={line.text} segs={line.segs} />
-                  {showSub && line.sub && <span className="line-sub">{line.sub}</span>}
-                </button>
+                {isPlain ? (
+                  <div className="line-btn line-static">
+                    {line.chant && <span className="line-tag">{CHANT_LABEL[line.chant]}</span>}
+                    {line.roman && <span className="line-roman">{line.roman}</span>}
+                    <LineText text={line.text} segs={line.segs} />
+                    {showSub && line.sub && <span className="line-sub">{line.sub}</span>}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    className="line-btn"
+                    aria-current={i === active ? "true" : undefined}
+                    onClick={() => handleSeek(line.startSec)}
+                  >
+                    {line.chant && <span className="line-tag">{CHANT_LABEL[line.chant]}</span>}
+                    {line.roman && <span className="line-roman">{line.roman}</span>}
+                    <LineText text={line.text} segs={line.segs} />
+                    {showSub && line.sub && <span className="line-sub">{line.sub}</span>}
+                  </button>
+                )}
               </li>
             ))}
           </ol>

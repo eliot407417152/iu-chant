@@ -53,6 +53,18 @@ public final class SongDtos {
         }
     }
 
+    /** 哪些版本是「只有歌詞、不打點」。這種版本的歌詞行 startSec 一律是 -1，公開頁只顯示歌詞，不跟著影片捲動 */
+    public record PlainDto(boolean chant, boolean mv, boolean inst, boolean live) {
+        public boolean of(VideoKind kind) {
+            return switch (kind) {
+                case CHANT -> chant;
+                case MV -> mv;
+                case INST -> inst;
+                case LIVE -> live;
+            };
+        }
+    }
+
     public record SongDto(
             String id,
             String title,
@@ -62,7 +74,8 @@ public final class SongDtos {
             String featuring,
             VideosDto videos,
             Integer chantOrder,
-            LyricsDto lyrics) {}
+            LyricsDto lyrics,
+            PlainDto plain) {}
 
     /** 管理端：整批取代一首歌的影片、應援歌單順序與各版本歌詞 */
     public record SongContentRequest(
@@ -71,5 +84,30 @@ public final class SongDtos {
             @Valid VideoDto inst,
             @Valid VideoDto live,
             @Min(1) Integer chantOrder,
-            @NotNull @Valid LyricsDto lyrics) {}
+            @NotNull @Valid LyricsDto lyrics,
+            /** 可省略（視為每個版本都要打點） */
+            PlainDto plain) {}
+
+    /** 管理端：修改一首歌清單上的基本資料（曲名、曲序、時長、主打、Feat.、備註），也可以搬到別張專輯 */
+    public record SongMetaRequest(
+            @NotBlank @Size(max = 255) String title,
+            @Min(1) int trackNo,
+            @Min(0) int durationSec,
+            boolean titleTrack,
+            @Size(max = 200) String featuring,
+            @Size(max = 200) String note,
+            /** 要搬去的專輯 slug；省略代表留在原本的專輯 */
+            @Size(max = 150) String albumId) {}
+
+    /** 管理端：在某張專輯新增一首歌 */
+    public record SongCreateRequest(
+            @NotBlank @Size(max = 255) String title,
+            @Min(1) Integer trackNo,
+            @Min(0) Integer durationSec,
+            boolean titleTrack,
+            @Size(max = 200) String featuring,
+            @Size(max = 200) String note) {}
+
+    /** 管理端：整批設定應援歌單。依序排列的歌曲 slug，沒出現的歌會被移出歌單 */
+    public record ChantListRequest(@NotNull @Size(max = 500) List<String> songs) {}
 }

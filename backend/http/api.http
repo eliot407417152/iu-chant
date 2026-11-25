@@ -32,6 +32,29 @@ X-Admin-Key: change-me
   }
 }
 
+### 只上歌詞、不打點：plain 裡設 true 的版本，歌詞行的 startSec 可以隨便填（會被存成 -1），歌曲頁只顯示歌詞
+# PUT http://localhost:8080/api/admin/songs/i-stan-u/content
+# { "chant": { "id": "6ElB5I2r-U8", "offsetSec": 0 }, "lyrics": { "chant": [ { "startSec": -1, "text": "<歌詞>" } ] }, "plain": { "chant": true } }
+
+### 修改清單上的資料：曲名、曲序、時長（秒）、主打、Feat.、備註；albumId 填別張專輯的 slug 就是搬過去
+PUT http://localhost:8080/api/admin/songs/i-stan-u/meta
+Content-Type: application/json
+X-Admin-Key: change-me
+
+{ "title": "I stan U", "trackNo": 1, "durationSec": 200, "titleTrack": false, "featuring": "", "note": "" }
+
+### 在專輯新增一首歌
+# POST http://localhost:8080/api/admin/albums/<專輯slug>/songs
+# { "title": "新歌", "durationSec": 0, "titleTrack": false }
+
+### 修改專輯資料（type：studio / mini / repackage / single / remake / ost）
+# PUT http://localhost:8080/api/admin/albums/<專輯slug>
+# { "title": "...", "typeLabel": "迷你一輯", "type": "mini", "releaseDate": "2024-05-01", "note": "" }
+
+### 整批設定應援歌單（依序，沒列出的歌會移出歌單）
+# PUT http://localhost:8080/api/admin/songs/chant-list
+# { "songs": ["i-stan-u"] }
+
 ### 匯出備份（全部專輯、影片、應援歌單順序、各版本歌詞）
 GET http://localhost:8080/api/admin/backup
 X-Admin-Key: change-me

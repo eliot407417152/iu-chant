@@ -6,17 +6,7 @@ import { coverSrc } from "@/lib/config";
 import type { Album, SongSummary } from "@/lib/types";
 import { formatDate, formatDuration } from "@/lib/format";
 
-type Filter = "all" | "chant" | "studio" | "mini" | "single" | "remake" | "ost";
-
-const FILTERS: { key: Filter; label: string }[] = [
-  { key: "all", label: "全部" },
-  { key: "chant", label: "應援歌單" },
-  { key: "studio", label: "正規專輯" },
-  { key: "mini", label: "迷你專輯" },
-  { key: "single", label: "單曲" },
-  { key: "remake", label: "翻唱專輯" },
-  { key: "ost", label: "OST" },
-];
+import { FILTERS, type Filter } from "@/lib/filter";
 
 function matches(a: Album, f: Filter): boolean {
   if (f === "all") return true;
@@ -70,9 +60,17 @@ function TrackRow({ s, href, sub, hideChantTag }: { s: SongSummary; href: string
   );
 }
 
-export default function AlbumBrowser({ albums }: { albums: Album[] }) {
-  const [filter, setFilter] = useState<Filter>("all");
+export default function AlbumBrowser({ albums, initialFilter = "all" }: { albums: Album[]; initialFilter?: Filter }) {
+  const [filter, setFilterState] = useState<Filter>(initialFilter);
   const [newestFirst, setNewestFirst] = useState(true);
+
+  // 目前的分類記在網址（?cat=chant）。從歌曲頁按返回，或按瀏覽器上一頁，才會回到同一個分類，
+  // 例如從應援歌單點進去的歌，返回就是應援歌單，不會跑去專輯
+  const setFilter = (f: Filter) => {
+    setFilterState(f);
+    const url = f === "all" ? window.location.pathname : `${window.location.pathname}?cat=${f}`;
+    window.history.replaceState(window.history.state, "", url);
+  };
 
   const chantSongs = useMemo(
     () =>

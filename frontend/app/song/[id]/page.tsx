@@ -1,11 +1,7 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import AdminEditLink from "@/components/AdminEditLink";
-import LyricsPlayer from "@/components/LyricsPlayer";
+import SongView from "@/components/SongView";
 import { getAlbums, getSong } from "@/lib/api";
-import { formatDate } from "@/lib/format";
-import { buildQueue, neighbors, type ListKey } from "@/lib/queue";
-import { VIDEO_KINDS } from "@/lib/types";
+import type { ListKey, QueueAlbum } from "@/lib/queue";
 
 export default async function SongPage({
   params,
@@ -20,46 +16,13 @@ export default async function SongPage({
   const [song, albums] = await Promise.all([getSong(id), getAlbums()]);
   if (!song) notFound();
 
-  // 播放佇列：應援歌單，或同一張專輯
-  let listKey: ListKey = list === "chant" ? "chant" : "album";
-  let queue = buildQueue(albums, listKey, song.albumId);
-  if (!queue.some((q) => q.id === song.id)) {
-    listKey = "album";
-    queue = buildQueue(albums, "album", song.albumId);
-  }
-  const { prev, next, position, total } = neighbors(queue, song.id, listKey === "chant");
-  const hrefOf = (songId: string) => `/song/${songId}?list=${listKey}&autoplay=1`;
-  const queueLabel = `${listKey === "chant" ? "應援歌單" : song.albumTitle} ${position} / ${total}`;
+  // 只把建立播放佇列需要的欄位交給瀏覽器
+  const queueAlbums: QueueAlbum[] = albums.map((a) => ({
+    id: a.id,
+    title: a.title,
+    songs: a.songs.map((s) => ({ id: s.id, title: s.title, hasVideo: s.hasVideo, chantOrder: s.chantOrder })),
+  }));
+  const initialList: ListKey = list === "chant" ? "chant" : "album";
 
-  const hasVideo = VIDEO_KINDS.some((k) => song.videos[k]);
-
-  return (
-    <main className="shell">
-      <nav className="song-nav">
-        <Link href={`/#album-${song.albumId}`} className="back">‹ {song.albumTitle}</Link>
-        <AdminEditLink songId={song.id} />
-      </nav>
-      <header className="song-head">
-        <h1>{song.title}</h1>
-        <p className="muted">
-          {song.albumTitle}・{formatDate(song.releaseDate)}
-          {song.featuring && `・${song.featuring}`}
-        </p>
-      </header>
-
-      {hasVideo ? (
-        <LyricsPlayer
-          key={song.id}
-          videos={song.videos}
-          lyrics={song.lyrics}
-          autoplay={autoplay === "1"}
-          prev={prev ? { href: hrefOf(prev.id), title: prev.title } : undefined}
-          next={next ? { href: hrefOf(next.id), title: next.title } : undefined}
-          queueLabel={queueLabel}
-        />
-      ) : (
-        <p className="empty">這首歌的影片與應援法還在整理中。</p>
-      )}
-    </main>
-  );
+  return <SongView initialSong={song} albums={queueAlbums} initialList={initialList} initialAutoplay={autoplay === "1"} />;
 }

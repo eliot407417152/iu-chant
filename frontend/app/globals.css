@@ -557,3 +557,44 @@ button { font: inherit; color: inherit; }
   .key-hint { display: none; } /* 手機沒有空白鍵 */
   .toast { bottom: max(20px, calc(12px + env(safe-area-inset-bottom))); }
 }
+
+/* ===== 手機：點一下開始播放（瀏覽器擋掉自動播放時） ===== */
+.tap-play {
+  position: absolute; inset: 0; z-index: 2; width: 100%;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px;
+  padding: 12px; border: 0; cursor: pointer; text-align: center;
+  background: rgba(20, 18, 42, .72); color: #fff; font: inherit; font-size: 1.25rem; font-weight: 700;
+}
+.tap-play span { font-size: .8rem; font-weight: 400; opacity: .85; max-width: 22rem; }
+
+/* ===== 只有歌詞（不打點）的版本 ===== */
+.lyrics.lyrics-plain { padding: 8px 0; height: auto; max-height: none; overflow: visible; }
+.line-static { cursor: default; }
+.line-static:hover { background: none; }
+.ed-plain { margin: 0; }
+.ed-row.ed-row-plain { grid-template-columns: 2.4rem minmax(0, 1fr) auto; }
+
+/* ===== 管理員：清單資料、專輯編輯、應援歌單管理 ===== */
+.ed-details { border: 1px solid var(--line); border-radius: 14px; background: var(--surface); padding: 0 14px; }
+.ed-details > summary { cursor: pointer; padding: 12px 0; font-weight: 700; }
+.ed-details[open] > summary { border-bottom: 1px solid var(--line); margin-bottom: 12px; }
+.admin-meta { display: flex; flex-direction: column; gap: 12px; border: 0; padding: 0 0 14px; background: none; }
+.admin-meta legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.admin-box { margin: 0 0 12px; display: flex; flex-direction: column; gap: 10px; }
+.admin-form {
+  display: flex; flex-direction: column; gap: 12px; padding: 14px;
+  border: 1px solid var(--line); border-radius: 14px; background: var(--surface);
+}
+.chant-mgr-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; }
+.chant-mgr-head h2 { margin: 0; }
+.chant-mgr-list { list-style: none; margin: 10px 0; padding: 0; border: 1px solid var(--line); border-radius: 12px; overflow: hidden; }
+.chant-mgr-row { display: grid; grid-template-columns: 2rem minmax(0, 1fr) auto; gap: 8px; align-items: center; padding: 8px 10px; }
+.chant-mgr-row + .chant-mgr-row { border-top: 1px solid var(--line); }
+.chant-mgr-title { min-width: 0; overflow-wrap: anywhere; }
+.ed-edit-field select {
+  font: inherit; color: var(--ink); background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 8px;
+}
+@media (max-width: 520px) {
+  .ed-row.ed-row-plain { grid-template-columns: 2rem minmax(0, 1fr) auto; }
+  .ed-row.ed-row-plain > .ed-row-btns { grid-column: 3; grid-row: 1; }
+}

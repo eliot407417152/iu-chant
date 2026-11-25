@@ -6,8 +6,9 @@ import { useYouTubePlayer } from "@/hooks/useYouTubePlayer";
 import { PUBLIC_API_URL } from "@/lib/config";
 import { formatClock } from "@/lib/format";
 import { extractVideoId, parseLyrics, type DraftLine } from "@/lib/parseLyrics";
-import { CHANT_LABEL, VIDEO_KINDS, VIDEO_LABEL, type Song, type VideoKind } from "@/lib/types";
+import { CHANT_LABEL, NO_PLAIN, VIDEO_KINDS, VIDEO_LABEL, type PlainFlags, type Song, type VideoKind } from "@/lib/types";
 import { useAdmin } from "./AdminProvider";
+import SongMetaForm, { type SongMeta } from "./SongMetaForm";
 import LineEditor from "./LineEditor";
 import LineText from "./LineText";
 import TimeInput from "./TimeInput";
@@ -32,7 +33,14 @@ function firstUnstamped(lines: DraftLine[]): number {
   return i >= 0 ? i : 0;
 }
 
-export default function Editor({ song }: { song: Song }) {
+interface EditorProps {
+  song: Song;
+  /** 清單上的資料（曲名、專輯、曲序、時長、主打、Feat.、備註） */
+  meta: SongMeta;
+  albums: { id: string; title: string }[];
+}
+
+export default function Editor({ song, meta, albums }: EditorProps) {
   const { adminKey, ready, logout } = useAdmin();
   if (!ready) return null;
   if (!adminKey) {
@@ -45,10 +53,19 @@ export default function Editor({ song }: { song: Song }) {
       </main>
     );
   }
-  return <EditorInner song={song} adminKey={adminKey} onAuthFail={logout} />;
+  return <EditorInner song={song} meta={meta} albums={albums} adminKey={adminKey} onAuthFail={logout} />;
 }
 
-function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: string; onAuthFail: () => void }) {
+function EditorInner({
+  song,
+  meta,
+  albums,
+  adminKey,
+  onAuthFail,
+}: EditorProps & { adminKey: string; onAuthFail: () => void }) {
+  const [title, setTitle] = useState(song.title);
+  /** 「只有歌詞、不打點」的版本 */
+  const [plainBy, setPlainBy] = useState<PlainFlags>(() => ({ ...NO_PLAIN, ...(song.plain ?? {}) }));
   const [vin, setVin] = useState<Record<VideoKind, VideoInput>>(() =>
     VIDEO_KINDS.reduce(
       (acc, k) => ({
@@ -80,6 +97,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
   const [rawBy, setRawBy] = useState<Record<VideoKind, string>>(() => emptyBy(() => ""));
   const lines = linesBy[kind];
   const raw = rawBy[kind];
+  const plain = plainBy[kind];
 
   const [cursor, setCursor] = useState(() => firstUnstamped(linesBy[kind]));
   const [now, setNow] = useState(0);
@@ -108,11 +126,11 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
   }, [ready, getTime, offset]);
 
   const stamp = useCallback(() => {
-    if (!ready || cursor >= lines.length) return;
+    if (plain || !ready || cursor >= lines.length) return;
     const t = Math.max(0, Math.round((getTime() + offset - LEAD_SEC) * 10) / 10);
     setLines((ls) => ls.map((l, i) => (i === cursor ? { ...l, startSec: t } : l)));
     setCursor((c) => c + 1);
-  }, [ready, cursor, lines.length, getTime, offset, setLines]);
+  }, [plain, ready, cursor, lines.length, getTime, offset, setLines]);
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -161,7 +179,12 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
     setSkipped(r.skippedNotes);
     setCursor(0);
     setEditing(null);
-    setMsg({ ok: true, text: `「${VIDEO_LABEL[kind]}」解析出 ${r.lines.length} 行，請開始打點。` });
+    setMsg({
+      ok: true,
+      text: plain
+        ? `「${VIDEO_LABEL[kind]}」解析出 ${r.lines.length} 行，按「儲存」就會在歌曲頁顯示純歌詞。`
+        : `「${VIDEO_LABEL[kind]}」解析出 ${r.lines.length} 行，請開始打點。`,
+    });
   };
 
   /** 把另一個版本的歌詞文字帶過來，時間清空重新打點（例如演唱會版歌詞一樣，但時間不同） */
@@ -259,8 +282,16 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
       const id = extractVideoId(vin[k].input);
       return id ? { id, offsetSec: Number(vin[k].offset) || 0 } : undefined;
     };
+    // 「只有歌詞」的版本不需要時間，一律送 -1
     const ly = (k: VideoKind) =>
-      linesBy[k].map((l) => ({ startSec: l.startSec ?? -1, text: l.text, roman: l.roman, sub: l.sub, chant: l.chant, segs: l.segs }));
+      linesBy[k].map((l) => ({
+        startSec: plainBy[k] ? -1 : (l.startSec ?? -1),
+        text: l.text,
+        roman: l.roman,
+        sub: l.sub,
+        chant: l.chant,
+        segs: l.segs,
+      }));
     return {
       chant: vid("chant"),
       mv: vid("mv"),
@@ -268,6 +299,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
       live: vid("live"),
       chantOrder: order.trim() === "" ? null : Number(order),
       lyrics: { chant: ly("chant"), mv: ly("mv"), inst: ly("inst"), live: ly("live") },
+      plain: plainBy,
     };
   };
 
@@ -299,7 +331,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
       });
       if (res.ok) {
         const t = new Date().toLocaleTimeString("zh-TW", { hour12: false });
-        const pending = VIDEO_KINDS.map((k) => ({ k, n: linesBy[k].filter((l) => l.startSec == null).length })).filter((x) => x.n > 0);
+        const pending = VIDEO_KINDS.map((k) => ({ k, n: plainBy[k] ? 0 : linesBy[k].filter((l) => l.startSec == null).length })).filter((x) => x.n > 0);
         setMsg({
           ok: true,
           text: pending.length
@@ -336,12 +368,24 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
         <Link href={`/song/${song.id}`} className="pill">看歌曲頁</Link>
       </nav>
       <header className="song-head">
-        <h1>編輯：{song.title}</h1>
-        <p className="muted">{song.albumTitle}・設定影片、應援歌單順序、各版本的歌詞與應援法。</p>
+        <h1>編輯：{title}</h1>
+        <p className="muted">{song.albumTitle}・設定清單資料、影片、應援歌單順序、各版本的歌詞與應援法。</p>
       </header>
 
       <div className="ed-grid">
         <section className="ed-left">
+          <details className="ed-details">
+            <summary>清單資料與標註（曲名、專輯、曲序、時長、主打、Feat.、備註）</summary>
+            <SongMetaForm
+              slug={song.id}
+              initial={meta}
+              albums={albums}
+              adminKey={adminKey}
+              onAuthFail={onAuthFail}
+              onSaved={(m) => setTitle(m.title)}
+            />
+          </details>
+
           <fieldset className="ed-videos">
             <legend>YouTube 影片（沒有的留空）</legend>
             {VIDEO_KINDS.map((k) => (
@@ -391,20 +435,41 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
           <p className="ed-editing">
             正在編輯：<strong>{VIDEO_LABEL[kind]}</strong> 的歌詞（{lines.length} 行）
           </p>
-          <div className="ed-stamp">
-            <button type="button" className="stamp-btn" onClick={stamp} disabled={!ready || cursor >= lines.length}>
-              打點<span className="key-hint">（空白鍵）</span>
-            </button>
-            <span className="muted">
-              目前 {formatClock(now)}・下一行：第 {Math.min(cursor + 1, lines.length)} / {lines.length} 行
-            </span>
+          {plain ? (
+            <p className="muted ed-hint">這個版本是「只有歌詞」，不需要打點。</p>
+          ) : (
+            <div className="ed-stamp">
+              <button type="button" className="stamp-btn" onClick={stamp} disabled={!ready || cursor >= lines.length}>
+                打點<span className="key-hint">（空白鍵）</span>
+              </button>
+              <span className="muted">
+                目前 {formatClock(now)}・下一行：第 {Math.min(cursor + 1, lines.length)} / {lines.length} 行
+              </span>
+            </div>
+          )}
           </div>
           </div>
-          </div>
-          <p className="muted ed-hint">
-            每一行開始唱的瞬間按空白鍵（已自動提早 {LEAD_SEC} 秒）。上下方向鍵可移動目前行，也能直接改右邊的分與秒。
-            按鍵沒反應時，先點一下影片外的空白處。
-          </p>
+          {!plain && (
+            <p className="muted ed-hint">
+              每一行開始唱的瞬間按空白鍵（已自動提早 {LEAD_SEC} 秒）。上下方向鍵可移動目前行，也能直接改右邊的分與秒。
+              按鍵沒反應時，先點一下影片外的空白處。
+            </p>
+          )}
+
+          <label className="toggle ed-plain">
+            <input
+              type="checkbox"
+              checked={plain}
+              onChange={(e) => setPlainBy((p) => ({ ...p, [kind]: e.target.checked }))}
+            />
+            「{VIDEO_LABEL[kind]}」只上歌詞，不用對時間
+          </label>
+          {plain && (
+            <p className="muted ed-hint">
+              開啟後，這個版本在歌曲頁只會顯示歌詞（含空耳、翻譯、應援顏色），不會跟著影片捲動，也不能點歌詞跳轉。
+              之後想對時間，把這個勾選拿掉再打點就可以了，歌詞文字會保留。
+            </p>
+          )}
 
           <label className="ed-field">
             貼上「{VIDEO_LABEL[kind]}」的歌詞
@@ -458,7 +523,7 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
               {lines.map((l, i) => (
                 <li
                   key={i}
-                  className={["ed-row", i === cursor ? "is-cursor" : "", l.chant ? `has-chant c-${l.chant}` : ""]
+                  className={["ed-row", plain ? "ed-row-plain" : "", !plain && i === cursor ? "is-cursor" : "", l.chant ? `has-chant c-${l.chant}` : ""]
                     .join(" ")
                     .trim()}
                 >
@@ -471,16 +536,18 @@ function EditorInner({ song, adminKey, onAuthFail }: { song: Song; adminKey: str
                     {l.text ? <LineText text={l.text} segs={l.segs} /> : <span className="line-text muted">（空白行，按「編輯」填入文字）</span>}
                     {l.sub && <span className="line-sub">{l.sub}</span>}
                   </span>
-                  <TimeInput value={l.startSec} onChange={(v) => setStart(i, v)} label={`第 ${i + 1} 行開始時間`} />
+                  {!plain && <TimeInput value={l.startSec} onChange={(v) => setStart(i, v)} label={`第 ${i + 1} 行開始時間`} />}
                   <span className="ed-row-btns">
-                    <button
-                      type="button"
-                      className="btn"
-                      disabled={l.startSec == null || !ready}
-                      onClick={() => seekTo(Math.max(0, (l.startSec as number) - offset))}
-                    >
-                      播放
-                    </button>
+                    {!plain && (
+                      <button
+                        type="button"
+                        className="btn"
+                        disabled={l.startSec == null || !ready}
+                        onClick={() => seekTo(Math.max(0, (l.startSec as number) - offset))}
+                      >
+                        播放
+                      </button>
+                    )}
                     <button
                       type="button"
                       className={editing === i ? "btn is-on" : "btn"}

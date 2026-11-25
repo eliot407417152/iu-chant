@@ -43,10 +43,19 @@ interface Options {
   onEnded?: () => void;
 }
 
+/**
+ * YouTube 播放器。播放器只建立一次，換影片時用 loadVideoById 沿用同一個 iframe。
+ * 手機瀏覽器只允許「使用者點過的播放器」自動播放，如果每首歌都重建播放器，
+ * 第二首起就會被擋下來，所以換歌一定要沿用同一個播放器。
+ */
 export function useYouTubePlayer(videoId: string, options: Options = {}) {
   const containerRef = useRef<HTMLDivElement>(null);
   const playerRef = useRef<any>(null);
   const optsRef = useRef(options);
+  const wantedRef = useRef(videoId);
+  const readyRef = useRef(false);
+  const creatingRef = useRef(false);
+  const unmountedRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -56,46 +65,84 @@ export function useYouTubePlayer(videoId: string, options: Options = {}) {
     optsRef.current = options;
   });
 
-  useEffect(() => {
-    const container = containerRef.current;
-    if (!container || !videoId) return;
-
-    let cancelled = false;
+  const destroy = useCallback(() => {
+    try {
+      playerRef.current?.destroy();
+    } catch {}
+    playerRef.current = null;
+    readyRef.current = false;
+    if (containerRef.current) containerRef.current.innerHTML = "";
     setReady(false);
+    setPlaying(false);
+  }, []);
+
+  // 真正離開頁面（元件卸載）才銷毀播放器
+  useEffect(() => {
+    unmountedRef.current = false;
+    return () => {
+      unmountedRef.current = true;
+      destroy();
+    };
+  }, [destroy]);
+
+  useEffect(() => {
+    wantedRef.current = videoId;
     setError(null);
 
+    if (!videoId) {
+      destroy();
+      return;
+    }
+
+    const load = (id: string) => {
+      try {
+        if (optsRef.current.autoplay) playerRef.current?.loadVideoById(id);
+        else playerRef.current?.cueVideoById(id);
+      } catch {}
+    };
+
+    // 播放器已經好了：直接換影片
+    if (playerRef.current && readyRef.current) {
+      setPlaying(false);
+      load(videoId);
+      return;
+    }
+    // 播放器還在建立中：建好時會讀 wantedRef
+    if (playerRef.current || creatingRef.current) return;
+
+    creatingRef.current = true;
     loadYouTubeApi().then(() => {
-      if (cancelled) return;
+      creatingRef.current = false;
+      const container = containerRef.current;
+      const initial = wantedRef.current;
+      if (unmountedRef.current || !container || !initial) return;
+
       // YT.Player 會取代傳入的元素，所以放一個臨時子元素給它，避免 React 找不到節點
       const mount = document.createElement("div");
       container.appendChild(mount);
 
       playerRef.current = new window.YT.Player(mount, {
-        videoId,
+        videoId: initial,
         width: "100%",
         height: "100%",
         playerVars: { playsinline: 1, rel: 0, modestbranding: 1, autoplay: optsRef.current.autoplay ? 1 : 0 },
         events: {
-          onReady: () => !cancelled && setReady(true),
+          onReady: () => {
+            if (unmountedRef.current) return;
+            readyRef.current = true;
+            setReady(true);
+            if (wantedRef.current && wantedRef.current !== initial) load(wantedRef.current);
+          },
           onStateChange: (e: any) => {
-            if (cancelled) return;
+            if (unmountedRef.current) return;
             setPlaying(e.data === window.YT.PlayerState.PLAYING);
             if (e.data === window.YT.PlayerState.ENDED) optsRef.current.onEnded?.();
           },
-          onError: (e: any) => !cancelled && setError(ERROR_MESSAGES[e.data] ?? "影片載入失敗。"),
+          onError: (e: any) => !unmountedRef.current && setError(ERROR_MESSAGES[e.data] ?? "影片載入失敗。"),
         },
       });
     });
-
-    return () => {
-      cancelled = true;
-      try {
-        playerRef.current?.destroy();
-      } catch {}
-      playerRef.current = null;
-      container.innerHTML = "";
-    };
-  }, [videoId]);
+  }, [videoId, destroy]);
 
   const getTime = useCallback((): number => {
     try {
@@ -112,5 +159,12 @@ export function useYouTubePlayer(videoId: string, options: Options = {}) {
     p.playVideo();
   }, []);
 
-  return { containerRef, ready, playing, error, getTime, seekTo };
+  /** 直接播放。要在使用者點擊時呼叫，手機瀏覽器才會允許 */
+  const play = useCallback(() => {
+    try {
+      playerRef.current?.playVideo();
+    } catch {}
+  }, []);
+
+  return { containerRef, ready, playing, error, getTime, seekTo, play };
 }

@@ -1,5 +1,11 @@
 package com.example.iuchant.album;
 
+import com.example.iuchant.album.AlbumDtos.AlbumDto;
+import com.example.iuchant.album.AlbumDtos.AlbumMetaRequest;
+import com.example.iuchant.song.SongDtos.SongCreateRequest;
+import com.example.iuchant.song.SongDtos.SongDto;
+import com.example.iuchant.song.SongService;
+import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 
@@ -12,9 +18,25 @@ public class AdminAlbumController {
     public record CoverResponse(String coverUrl) {}
 
     private final CoverService covers;
+    private final AlbumService albums;
+    private final SongService songs;
 
-    public AdminAlbumController(CoverService covers) {
+    public AdminAlbumController(CoverService covers, AlbumService albums, SongService songs) {
         this.covers = covers;
+        this.albums = albums;
+        this.songs = songs;
+    }
+
+    /** 修改專輯的曲名、類別（分類）、發行日期與備註 */
+    @PutMapping("/{slug}")
+    public AlbumDto updateMeta(@PathVariable String slug, @Valid @RequestBody AlbumMetaRequest request) {
+        return albums.updateMeta(slug, request);
+    }
+
+    /** 在這張專輯新增一首歌 */
+    @PostMapping("/{slug}/songs")
+    public SongDto addSong(@PathVariable String slug, @Valid @RequestBody SongCreateRequest request) {
+        return songs.create(slug, request);
     }
 
     /** 直接把圖片位元組當成請求內容送來，Content-Type 為 image/jpeg、image/png 或 image/webp */

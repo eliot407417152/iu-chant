@@ -53,6 +53,10 @@ export type Videos = Partial<Record<VideoKind, VideoSource>>;
 /** 每個影片版本各自一份歌詞（沒有歌詞就是空陣列） */
 export type Lyrics = Record<VideoKind, LyricLine[]>;
 
+/** 哪些版本是「只有歌詞、不打點」：這種版本的歌詞行 startSec 都是 -1，只顯示歌詞，不跟著影片捲動 */
+export type PlainFlags = Record<VideoKind, boolean>;
+export const NO_PLAIN: PlainFlags = { chant: false, mv: false, inst: false, live: false };
+
 export type AlbumType = "studio" | "mini" | "repackage" | "single" | "remake" | "ost";
 
 /** 專輯列表裡的一首歌 */
@@ -97,4 +101,15 @@ export interface Song {
   videos: Videos;
   chantOrder?: number;
   lyrics: Lyrics;
+  /** 舊版後端沒有這個欄位，視為每個版本都要打點 */
+  plain?: PlainFlags;
 }
+
+export const ALBUM_TYPES: { value: AlbumType; label: string }[] = [
+  { value: "studio", label: "正規專輯" },
+  { value: "repackage", label: "改版專輯（歸在正規專輯）" },
+  { value: "mini", label: "迷你專輯" },
+  { value: "single", label: "單曲" },
+  { value: "remake", label: "翻唱專輯" },
+  { value: "ost", label: "OST" },
+];

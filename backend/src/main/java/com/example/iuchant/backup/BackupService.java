@@ -7,7 +7,6 @@ import com.example.iuchant.backup.BackupDtos.*;
 import com.example.iuchant.song.Song;
 import com.example.iuchant.song.SongRepository;
 import com.example.iuchant.song.SongService;
-import com.example.iuchant.song.VideoKind;
 import org.springframework.data.domain.Sort;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -89,7 +88,7 @@ public class BackupService {
                 s.setTitleTrack(bs.titleTrack());
                 s.setFeaturing(bs.featuring());
                 s.setNote(bs.note());
-                songService.applyContent(s, bs.chant(), bs.mv(), bs.inst(), bs.live(), bs.chantOrder(), bs.lyrics());
+                songService.applyContent(s, bs.chant(), bs.mv(), bs.inst(), bs.live(), bs.chantOrder(), bs.lyrics(), bs.plain());
                 songCount++;
                 lineCount += s.getLines().size();
             }
@@ -111,6 +110,6 @@ public class BackupService {
         var v = songService.toVideos(s);
         return new BackupSong(s.getSlug(), s.getTrackNo(), s.getTitle(), s.getDurationSec(), s.isTitleTrack(),
                 s.getFeaturing(), s.getNote(), s.getChantOrder(),
-                v.chant(), v.mv(), v.inst(), v.live(), songService.toLyrics(s));
+                v.chant(), v.mv(), v.inst(), v.live(), songService.toLyrics(s), songService.toPlain(s));
     }
 }

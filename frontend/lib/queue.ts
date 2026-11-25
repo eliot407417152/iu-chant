@@ -1,5 +1,3 @@
-import type { Album } from "./types";
-
 export type ListKey = "chant" | "album";
 
 export interface QueueItem {
@@ -8,8 +6,15 @@ export interface QueueItem {
   hasVideo: boolean;
 }
 
+/** 建立播放佇列只需要這些欄位（完整的 Album 也能直接傳進來） */
+export interface QueueAlbum {
+  id: string;
+  title: string;
+  songs: { id: string; title: string; hasVideo: boolean; chantOrder?: number }[];
+}
+
 /** 播放佇列：應援歌單依 chantOrder 排序；否則是同一張專輯的曲序 */
-export function buildQueue(albums: Album[], list: ListKey, albumId: string): QueueItem[] {
+export function buildQueue(albums: QueueAlbum[], list: ListKey, albumId: string): QueueItem[] {
   if (list === "chant") {
     return albums
       .flatMap((a) => a.songs.filter((s) => s.chantOrder != null))

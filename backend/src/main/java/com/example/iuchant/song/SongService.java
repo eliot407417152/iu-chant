@@ -1,5 +1,7 @@
 package com.example.iuchant.song;
 
+import com.example.iuchant.album.Album;
+import com.example.iuchant.album.AlbumRepository;
 import com.example.iuchant.song.SongDtos.*;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
@@ -10,16 +12,23 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.server.ResponseStatusException;
 
 import java.util.Comparator;
+import java.util.EnumSet;
+import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class SongService {
 
     private final SongRepository repo;
+    private final AlbumRepository albums;
     private static final ObjectMapper JSON = new ObjectMapper();
 
-    public SongService(SongRepository repo) {
+    public SongService(SongRepository repo, AlbumRepository albums) {
         this.repo = repo;
+        this.albums = albums;
     }
 
     @Transactional(readOnly = true)
@@ -31,13 +40,87 @@ public class SongService {
     @Transactional
     public SongDto updateContent(String slug, SongContentRequest req) {
         Song song = find(slug);
-        applyContent(song, req.chant(), req.mv(), req.inst(), req.live(), req.chantOrder(), req.lyrics());
+        applyContent(song, req.chant(), req.mv(), req.inst(), req.live(), req.chantOrder(), req.lyrics(), req.plain());
         return toDto(repo.save(song));
+    }
+
+    /** 修改清單上的基本資料（曲名、曲序、時長、主打、Feat.、備註），也可以把歌搬到別張專輯。slug 不變，網址不會失效 */
+    @Transactional
+    public SongDto updateMeta(String slug, SongMetaRequest req) {
+        Song song = find(slug);
+        if (req.albumId() != null && !req.albumId().isBlank() && !req.albumId().equals(song.getAlbum().getSlug())) {
+            Album target = albums.findBySlug(req.albumId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "找不到專輯：" + req.albumId()));
+            song.setAlbum(target);
+        }
+        song.setTitle(req.title().trim());
+        song.setTrackNo(req.trackNo());
+        song.setDurationSec(req.durationSec());
+        song.setTitleTrack(req.titleTrack());
+        song.setFeaturing(blankToNull(req.featuring()));
+        song.setNote(blankToNull(req.note()));
+        return toDto(repo.save(song));
+    }
+
+    /** 在專輯新增一首歌（還沒有影片與歌詞，之後用編輯頁補） */
+    @Transactional
+    public SongDto create(String albumSlug, SongCreateRequest req) {
+        Album album = albums.findBySlug(albumSlug)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "找不到專輯：" + albumSlug));
+        int trackNo = req.trackNo() != null
+                ? req.trackNo()
+                : album.getSongs().stream().mapToInt(Song::getTrackNo).max().orElse(0) + 1;
+
+        String base = albumSlug + "-t" + trackNo;
+        if (base.length() > 140) base = base.substring(0, 140);
+        String slug = base;
+        for (int i = 2; repo.existsBySlug(slug); i++) slug = base + "-" + i;
+
+        Song song = new Song();
+        song.setSlug(slug);
+        song.setAlbum(album);
+        song.setTrackNo(trackNo);
+        song.setTitle(req.title().trim());
+        song.setDurationSec(req.durationSec() == null ? 0 : req.durationSec());
+        song.setTitleTrack(req.titleTrack());
+        song.setFeaturing(blankToNull(req.featuring()));
+        song.setNote(blankToNull(req.note()));
+        return toDto(repo.save(song));
+    }
+
+    /** 刪除一首歌（連同它的影片與歌詞） */
+    @Transactional
+    public void delete(String slug) {
+        Song song = find(slug);
+        song.getAlbum().getSongs().remove(song);
+        repo.delete(song);
+    }
+
+    /** 整批設定應援歌單：依序編號 1、2、3…，沒列出的歌移出歌單。回傳歌單長度 */
+    @Transactional
+    public int setChantList(List<String> slugs) {
+        Map<String, Song> all = new HashMap<>();
+        for (Song s : repo.findAll()) all.put(s.getSlug(), s);
+
+        Set<String> seen = new HashSet<>();
+        for (String slug : slugs) {
+            if (!all.containsKey(slug)) {
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "找不到歌曲：" + slug);
+            }
+            if (!seen.add(slug)) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "歌曲重複：" + slug);
+            }
+        }
+        all.values().forEach(s -> s.setChantOrder(null));
+        int order = 1;
+        for (String slug : slugs) all.get(slug).setChantOrder(order++);
+        repo.saveAll(all.values());
+        return slugs.size();
     }
 
     /** 把影片、應援歌單順序與歌詞寫進 Song（不存檔）。管理頁儲存與備份還原共用 */
     public void applyContent(Song song, VideoDto chant, VideoDto mv, VideoDto inst, VideoDto live,
-                             Integer chantOrder, LyricsDto lyrics) {
+                             Integer chantOrder, LyricsDto lyrics, PlainDto plain) {
         song.setChantVideo(chant == null ? null : chant.id());
         song.setChantOffset(chant == null ? 0 : chant.offsetSec());
         song.setMvVideo(mv == null ? null : mv.id());
@@ -48,12 +131,20 @@ public class SongService {
         song.setLiveOffset(live == null ? 0 : live.offsetSec());
         song.setChantOrder(chantOrder);
 
+        Set<VideoKind> plainKinds = EnumSet.noneOf(VideoKind.class);
+        for (VideoKind kind : VideoKind.values()) {
+            if (plain != null && plain.of(kind)) plainKinds.add(kind);
+        }
+        song.setPlainKinds(plainKinds);
+
         song.getLines().clear();
         boolean hasChant = false;
         for (VideoKind kind : VideoKind.values()) {
             List<LyricLineDto> given = lyrics == null ? List.<LyricLineDto>of() : lyrics.of(kind);
+            // 「只有歌詞」的版本不打點：時間一律存 -1，並照編輯器的順序存
+            boolean isPlain = plainKinds.contains(kind);
             // 全部都打好點才依時間排序；還有草稿行（startSec < 0）時照編輯器的順序存，才不會把行順序打亂
-            boolean draft = given.stream().anyMatch(d -> d.startSec() < 0);
+            boolean draft = isPlain || given.stream().anyMatch(d -> d.startSec() < 0);
             List<LyricLineDto> sorted = draft
                     ? given
                     : given.stream().sorted(Comparator.comparingDouble(LyricLineDto::startSec)).toList();
@@ -63,7 +154,7 @@ public class SongService {
                 l.setSong(song);
                 l.setVideoKind(kind);
                 l.setLineNo(no++);
-                l.setStartSec(d.startSec());
+                l.setStartSec(isPlain ? -1 : d.startSec());
                 l.setText(d.text());
                 l.setRoman(blankToNull(d.roman()));
                 l.setSub(blankToNull(d.sub()));
@@ -83,7 +174,12 @@ public class SongService {
 
     private SongDto toDto(Song s) {
         return new SongDto(s.getSlug(), s.getTitle(), s.getAlbum().getSlug(), s.getAlbum().getTitle(),
-                s.getAlbum().getReleaseDate(), s.getFeaturing(), toVideos(s), s.getChantOrder(), toLyrics(s));
+                s.getAlbum().getReleaseDate(), s.getFeaturing(), toVideos(s), s.getChantOrder(), toLyrics(s), toPlain(s));
+    }
+
+    public PlainDto toPlain(Song s) {
+        return new PlainDto(s.isPlain(VideoKind.CHANT), s.isPlain(VideoKind.MV),
+                s.isPlain(VideoKind.INST), s.isPlain(VideoKind.LIVE));
     }
 
     public VideosDto toVideos(Song s) {

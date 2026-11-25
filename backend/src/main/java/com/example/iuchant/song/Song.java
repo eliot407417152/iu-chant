@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "song")
@@ -72,6 +74,13 @@ public class Song {
     @Column(name = "has_chant", nullable = false)
     private boolean hasChant;
 
+    /**
+     * 「只有歌詞、不打點」的影片版本，以逗號分隔，例如 "CHANT,LIVE"；null 代表每個版本都要打點。
+     * 欄位允許 null，舊資料庫自動新增欄位時不用刪資料。
+     */
+    @Column(name = "plain_kinds", length = 40)
+    private String plainKinds;
+
     @OneToMany(mappedBy = "song", cascade = CascadeType.ALL, orphanRemoval = true)
     @OrderBy("lineNo ASC")
     private List<LyricLine> lines = new ArrayList<>();
@@ -114,6 +123,16 @@ public class Song {
     public boolean isHasChant() { return hasChant; }
     public void setHasChant(boolean hasChant) { this.hasChant = hasChant; }
     public List<LyricLine> getLines() { return lines; }
+
+    public boolean isPlain(VideoKind kind) {
+        return plainKinds != null && java.util.Arrays.asList(plainKinds.split(",")).contains(kind.name());
+    }
+
+    public void setPlainKinds(Set<VideoKind> kinds) {
+        plainKinds = (kinds == null || kinds.isEmpty())
+                ? null
+                : kinds.stream().map(Enum::name).sorted().collect(Collectors.joining(","));
+    }
 
     public boolean hasAnyVideo() {
         return chantVideo != null || mvVideo != null || instVideo != null || liveVideo != null;

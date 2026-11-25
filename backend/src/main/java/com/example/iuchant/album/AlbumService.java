@@ -1,11 +1,14 @@
 package com.example.iuchant.album;
 
 import com.example.iuchant.album.AlbumDtos.AlbumDto;
+import com.example.iuchant.album.AlbumDtos.AlbumMetaRequest;
 import com.example.iuchant.album.AlbumDtos.SongSummaryDto;
 import com.example.iuchant.song.Song;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -22,6 +25,19 @@ public class AlbumService {
     @Transactional(readOnly = true)
     public List<AlbumDto> list() {
         return repo.findAll(Sort.by("releaseDate", "id")).stream().map(this::toDto).toList();
+    }
+
+    /** 修改專輯基本資料（slug 與封面不變） */
+    @Transactional
+    public AlbumDto updateMeta(String slug, AlbumMetaRequest req) {
+        Album a = repo.findBySlug(slug)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "找不到專輯：" + slug));
+        a.setTitle(req.title().trim());
+        a.setTypeLabel(req.typeLabel().trim());
+        a.setType(req.type());
+        a.setReleaseDate(req.releaseDate());
+        a.setNote(req.note() == null || req.note().isBlank() ? null : req.note().trim());
+        return toDto(repo.save(a));
     }
 
     private AlbumDto toDto(Album a) {
