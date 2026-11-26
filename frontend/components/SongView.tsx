@@ -51,7 +51,7 @@ export default function SongView({ initialSong, albums, initialList, initialAuto
   }, [next]);
 
   useEffect(() => {
-    document.title = `${song.title}・IU 應援歌單`;
+    document.title = `${song.title}・IU 應援`;
   }, [song.title]);
 
   const navigate = useCallback(

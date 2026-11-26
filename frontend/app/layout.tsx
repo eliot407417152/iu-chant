@@ -20,14 +20,14 @@ const ui = Noto_Sans_TC({
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
-  title: { default: `${SITE_NAME}｜IU 歌曲空耳與應援法`, template: `%s｜${SITE_NAME}` },
+  title: { default: SITE_NAME, template: `%s｜${SITE_NAME}` },
   description: SITE_DESCRIPTION,
   keywords: ["IU", "아이유", "IU 應援", "IU 應援法", "IU 空耳", "IU 歌詞", "IU 演唱會", "應援歌單"],
   openGraph: {
     type: "website",
     siteName: SITE_NAME,
     locale: "zh_TW",
-    title: `${SITE_NAME}｜IU 歌曲空耳與應援法`,
+    title: SITE_NAME,
     description: SITE_DESCRIPTION,
   },
   twitter: { card: "summary", title: SITE_NAME, description: SITE_DESCRIPTION },
