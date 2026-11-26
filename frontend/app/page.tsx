@@ -1,6 +1,10 @@
+import type { Metadata } from "next";
 import AlbumBrowser from "@/components/AlbumBrowser";
 import { parseFilter } from "@/lib/filter";
 import { getAlbums } from "@/lib/api";
+
+// 不管有沒有帶 ?cat= 分類參數，都告訴 Google 正規網址是首頁，避免重複收錄
+export const metadata: Metadata = { alternates: { canonical: "/" } };
 
 export default async function Home({ searchParams }: { searchParams: Promise<{ cat?: string }> }) {
   const { cat } = await searchParams;

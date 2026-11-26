@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Gowun_Batang, Noto_Sans_TC } from "next/font/google";
 import { AdminProvider } from "@/components/AdminProvider";
 import TopBar from "@/components/TopBar";
+import { SITE_DESCRIPTION, SITE_NAME, SITE_URL } from "@/lib/site";
 import "./globals.css";
 
 const lyric = Gowun_Batang({
@@ -18,8 +19,20 @@ const ui = Noto_Sans_TC({
 });
 
 export const metadata: Metadata = {
-  title: "IU 應援歌單",
-  description: "IU 歌曲的空耳與應援法，邊看影片邊跟著唱。",
+  metadataBase: new URL(SITE_URL),
+  title: { default: `${SITE_NAME}｜IU 歌曲空耳與應援法`, template: `%s｜${SITE_NAME}` },
+  description: SITE_DESCRIPTION,
+  keywords: ["IU", "아이유", "IU 應援", "IU 應援法", "IU 空耳", "IU 歌詞", "IU 演唱會", "應援歌單"],
+  openGraph: {
+    type: "website",
+    siteName: SITE_NAME,
+    locale: "zh_TW",
+    title: `${SITE_NAME}｜IU 歌曲空耳與應援法`,
+    description: SITE_DESCRIPTION,
+  },
+  twitter: { card: "summary", title: SITE_NAME, description: SITE_DESCRIPTION },
+  // Google Search Console 用「HTML 標籤」驗證時，把 content 值設在環境變數 GOOGLE_SITE_VERIFICATION
+  verification: process.env.GOOGLE_SITE_VERIFICATION ? { google: process.env.GOOGLE_SITE_VERIFICATION } : undefined,
 };
 
 export const viewport: Viewport = {
