@@ -2,7 +2,7 @@ FROM maven:3.9-eclipse-temurin-17 AS build
 WORKDIR /app
 
 # 改用 Google 的 Maven Central 鏡像，避免 Render 的 IP 被 Maven Central 限流（429）
-RUN printf '%s\n' \
+RUN mkdir -p /root/.m2 && printf '%s\n' \
   '<settings>' \
   '  <mirrors>' \
   '    <mirror>' \
@@ -16,7 +16,7 @@ RUN printf '%s\n' \
 COPY pom.xml .
 COPY src ./src
 RUN for i in 1 2 3; do \
-      mvn -q -B -DskipTests package && exit 0; \
+      mvn -q -B -s /root/.m2/settings.xml -DskipTests package && exit 0; \
       echo "build failed, retry $i"; sleep 20; \
     done; exit 1
 
