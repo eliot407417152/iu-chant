@@ -2,6 +2,7 @@ package com.example.iuchant.backup;
 
 import com.example.iuchant.album.Album;
 import com.example.iuchant.album.AlbumRepository;
+import com.example.iuchant.album.DeletedAlbumRepository;
 import com.example.iuchant.album.CoverService;
 import com.example.iuchant.backup.BackupDtos.*;
 import com.example.iuchant.song.Song;
@@ -31,9 +32,11 @@ public class BackupService {
     private final SongRepository songs;
     private final SongService songService;
     private final CoverService coverService;
+    private final DeletedAlbumRepository deleted;
 
     public BackupService(AlbumRepository albums, SongRepository songs, SongService songService,
-                         CoverService coverService) {
+                         CoverService coverService, DeletedAlbumRepository deleted) {
+        this.deleted = deleted;
         this.albums = albums;
         this.songs = songs;
         this.songService = songService;
@@ -66,6 +69,7 @@ public class BackupService {
             album.setReleaseDate(a.releaseDate());
             album.setCoverUrl(a.coverUrl());
             album.setNote(a.note());
+            deleted.deleteById(a.slug()); // 備份裡有這張專輯，還原時一併解除「已刪除」記錄
 
             Map<String, Song> existing = new HashMap<>();
             for (Song s : album.getSongs()) existing.put(s.getSlug(), s);

@@ -16,9 +16,23 @@ import java.util.List;
 public class AlbumService {
 
     private final AlbumRepository repo;
+    private final AlbumCoverRepository covers;
+    private final DeletedAlbumRepository deleted;
 
-    public AlbumService(AlbumRepository repo) {
+    public AlbumService(AlbumRepository repo, AlbumCoverRepository covers, DeletedAlbumRepository deleted) {
         this.repo = repo;
+        this.covers = covers;
+        this.deleted = deleted;
+    }
+
+    /** 刪除整張專輯（連同底下所有歌曲、影片、歌詞與上傳的封面），並記下它的代稱，重啟時不會被 catalog.json 補回來 */
+    @Transactional
+    public void delete(String slug) {
+        Album a = repo.findBySlug(slug)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "找不到專輯：" + slug));
+        covers.findByAlbumId(a.getId()).ifPresent(covers::delete);
+        repo.delete(a);
+        if (!deleted.existsById(slug)) deleted.save(new DeletedAlbum(slug));
     }
 
     /** 依發行日期由舊到新 */

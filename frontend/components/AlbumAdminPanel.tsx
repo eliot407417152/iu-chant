@@ -85,6 +85,20 @@ export default function AlbumAdminPanel({ album, adminKey, onAuthFail }: Props) 
       return "✓ 已新增歌曲，點進那首歌就能補影片與歌詞。";
     });
 
+  const removeAlbum = () => {
+    const n = album.songs.length;
+    const ok = window.confirm(
+      `確定要刪除「${album.title}」整張專輯嗎？\n\n` +
+        `底下的 ${n} 首歌，連同它們的影片、歌詞、應援法與上傳的封面都會一起刪除，無法復原。\n` +
+        `（建議先到頁面下方「匯出備份」留一份。）`,
+    );
+    if (!ok) return;
+    return run(async () => {
+      await adminFetch(adminKey, `/api/admin/albums/${encodeURIComponent(album.id)}`, "DELETE");
+      return `✓ 已刪除「${album.title}」。`;
+    });
+  };
+
   return (
     <div className="admin-box">
       <div className="ed-actions">
@@ -93,6 +107,9 @@ export default function AlbumAdminPanel({ album, adminKey, onAuthFail }: Props) 
         </button>
         <button type="button" className={open === "song" ? "btn is-on" : "btn"} onClick={() => setOpen(open === "song" ? "none" : "song")}>
           ＋ 新增歌曲
+        </button>
+        <button type="button" className="btn btn-danger" onClick={removeAlbum} disabled={busy}>
+          刪除專輯
         </button>
       </div>
 

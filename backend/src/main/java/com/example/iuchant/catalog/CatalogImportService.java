@@ -2,6 +2,7 @@ package com.example.iuchant.catalog;
 
 import com.example.iuchant.album.Album;
 import com.example.iuchant.album.AlbumRepository;
+import com.example.iuchant.album.DeletedAlbumRepository;
 import com.example.iuchant.catalog.CatalogDtos.CatalogAlbum;
 import com.example.iuchant.catalog.CatalogDtos.CatalogSong;
 import com.example.iuchant.song.Song;
@@ -24,10 +25,12 @@ public class CatalogImportService {
 
     private final AlbumRepository albums;
     private final SongRepository songs;
+    private final DeletedAlbumRepository deleted;
 
-    public CatalogImportService(AlbumRepository albums, SongRepository songs) {
+    public CatalogImportService(AlbumRepository albums, SongRepository songs, DeletedAlbumRepository deleted) {
         this.albums = albums;
         this.songs = songs;
+        this.deleted = deleted;
     }
 
     @Transactional
@@ -45,6 +48,7 @@ public class CatalogImportService {
             album.setReleaseDate(a.releaseDate());
             album.setCoverUrl(a.coverUrl());
             album.setNote(a.note());
+            deleted.deleteById(a.slug()); // 手動匯入代表要這張專輯，解除「已刪除」記錄
 
             Map<String, Song> existing = new HashMap<>();
             for (Song s : album.getSongs()) existing.put(s.getSlug(), s);

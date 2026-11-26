@@ -33,6 +33,13 @@ public class AdminAlbumController {
         return albums.updateMeta(slug, request);
     }
 
+    /** 刪除整張專輯（含所有歌曲與歌詞，無法復原；建議先匯出備份） */
+    @DeleteMapping("/{slug}")
+    public java.util.Map<String, Boolean> delete(@PathVariable String slug) {
+        albums.delete(slug);
+        return java.util.Map.of("deleted", true);
+    }
+
     /** 在這張專輯新增一首歌 */
     @PostMapping("/{slug}/songs")
     public SongDto addSong(@PathVariable String slug, @Valid @RequestBody SongCreateRequest request) {
